@@ -1,0 +1,245 @@
+{% extends 'hostel_app/admin/base_admin.html' %}
+{% block title %}Admin Dashboard — HostelHub{% endblock %}
+{% block admin_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle">Welcome back, {{ user.get_full_name|default:user.username }}! Here's what's happening today.</div>
+    </div>
+    <div style="font-size:13px;color:var(--gray-600);">
+        <i class="fa-regular fa-calendar"></i> {% now "D, d M Y" %}
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid fade-in fade-in-delay-1">
+    <div class="stat-card">
+        <div class="stat-icon navy"><i class="fa-solid fa-users"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ total_students }}</div>
+            <div class="stat-label">Active Students</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon success"><i class="fa-solid fa-door-open"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ available_rooms }}</div>
+            <div class="stat-label">Available Rooms</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon info"><i class="fa-solid fa-bed"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ occupied_rooms }}</div>
+            <div class="stat-label">Occupied Rooms</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon warning"><i class="fa-solid fa-user-clock"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ pending_students }}</div>
+            <div class="stat-label">Pending Approvals</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ open_complaints }}</div>
+            <div class="stat-label">Open Complaints</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon gold"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">₹{{ total_revenue|floatformat:0 }}</div>
+            <div class="stat-label">Total Revenue</div>
+        </div>
+    </div>
+</div>
+
+<!-- Room Status Chart -->
+<div class="grid-2 mb-32 fade-in fade-in-delay-2">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-chart-donut" style="color:var(--gold);margin-right:8px;"></i>Room Status Overview</div>
+            <a href="{% url 'manage_rooms' %}" class="btn btn-outline btn-sm">View All</a>
+        </div>
+        <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div style="background:rgba(26,158,110,0.08);border-radius:12px;padding:20px;text-align:center;">
+                    <div style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--success);">{{ room_status_data.available }}</div>
+                    <div style="font-size:13px;color:var(--gray-600);margin-top:4px;">Available</div>
+                </div>
+                <div style="background:rgba(34,114,195,0.08);border-radius:12px;padding:20px;text-align:center;">
+                    <div style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--info);">{{ room_status_data.occupied }}</div>
+                    <div style="font-size:13px;color:var(--gray-600);margin-top:4px;">Occupied</div>
+                </div>
+                <div style="background:rgba(224,124,31,0.08);border-radius:12px;padding:20px;text-align:center;">
+                    <div style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--warning);">{{ room_status_data.maintenance }}</div>
+                    <div style="font-size:13px;color:var(--gray-600);margin-top:4px;">Maintenance</div>
+                </div>
+                <div style="background:rgba(201,162,39,0.08);border-radius:12px;padding:20px;text-align:center;">
+                    <div style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--gold);">{{ room_status_data.reserved }}</div>
+                    <div style="font-size:13px;color:var(--gray-600);margin-top:4px;">Reserved</div>
+                </div>
+            </div>
+
+            <div style="margin-top:24px;">
+                {% with total=total_rooms %}
+                {% if total > 0 %}
+                <div style="margin-bottom:10px;">
+                    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
+                        <span style="color:var(--gray-600);">Occupancy Rate</span>
+                        <span style="font-weight:600;color:var(--navy);">{{ occupied_rooms }}/{{ total_rooms }}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width:{% widthratio occupied_rooms total_rooms 100 %}%;background:linear-gradient(90deg,var(--navy),var(--gold));"></div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+                <a href="{% url 'add_room' %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Add Room</a>
+                <a href="{% url 'available_rooms' %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-door-open"></i> Available</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-bolt" style="color:var(--gold);margin-right:8px;"></i>Quick Actions</div>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+            <a href="{% url 'add_allocation' %}" class="btn btn-primary" style="justify-content:flex-start;">
+                <i class="fa-solid fa-key"></i> Allocate Room to Student
+            </a>
+            <a href="{% url 'add_fee' %}" class="btn btn-gold" style="justify-content:flex-start;">
+                <i class="fa-solid fa-indian-rupee-sign"></i> Record Fee Payment
+            </a>
+            <a href="{% url 'add_notice' %}" class="btn btn-primary" style="justify-content:flex-start;">
+                <i class="fa-solid fa-bullhorn"></i> Post a Notice
+            </a>
+            <a href="{% url 'manage_students' %}?status=pending" class="btn btn-outline" style="justify-content:flex-start;">
+                <i class="fa-solid fa-user-check"></i> Approve Students
+                {% if pending_students > 0 %}<span class="badge badge-danger" style="margin-left:auto;">{{ pending_students }}</span>{% endif %}
+            </a>
+            <a href="{% url 'manage_complaints' %}?status=open" class="btn btn-outline" style="justify-content:flex-start;">
+                <i class="fa-solid fa-triangle-exclamation"></i> View Open Complaints
+                {% if open_complaints > 0 %}<span class="badge badge-danger" style="margin-left:auto;">{{ open_complaints }}</span>{% endif %}
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Data Tables -->
+<div class="grid-2 mb-32 fade-in fade-in-delay-3">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Recent Allocations</div>
+            <a href="{% url 'manage_allocations' %}" class="btn btn-outline btn-sm">View All</a>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Room</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alloc in recent_allocations %}
+                    <tr>
+                        <td>
+                            <div style="font-weight:600;font-size:14px;">{{ alloc.student.user.get_full_name }}</div>
+                            <div style="font-size:12px;color:var(--gray-400);">{{ alloc.student.roll_number }}</div>
+                        </td>
+                        <td><span class="badge badge-navy">{{ alloc.room.room_number }}</span></td>
+                        <td style="font-size:13px;color:var(--gray-600);">{{ alloc.allocated_date|date:"d M" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="text-center" style="padding:30px;color:var(--gray-400);">No allocations yet</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Recent Complaints</div>
+            <a href="{% url 'manage_complaints' %}" class="btn btn-outline btn-sm">View All</a>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in recent_complaints %}
+                    <tr>
+                        <td>
+                            <div style="font-size:13px;font-weight:600;">{{ c.subject|truncatechars:30 }}</div>
+                            <div style="font-size:12px;color:var(--gray-400);">{{ c.student.user.get_full_name }}</div>
+                        </td>
+                        <td>
+                            <span class="badge {% if c.priority == 'urgent' %}badge-danger{% elif c.priority == 'high' %}badge-warning{% else %}badge-gray{% endif %}">
+                                {{ c.get_priority_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if c.status == 'open' %}badge-danger{% elif c.status == 'in_progress' %}badge-warning{% elif c.status == 'resolved' %}badge-success{% else %}badge-gray{% endif %}">
+                                {{ c.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="text-center" style="padding:30px;color:var(--gray-400);">No complaints</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Payments -->
+<div class="card fade-in">
+    <div class="card-header">
+        <div class="card-title"><i class="fa-solid fa-receipt" style="color:var(--gold);margin-right:8px;"></i>Recent Fee Payments</div>
+        <a href="{% url 'manage_fees' %}" class="btn btn-outline btn-sm">View All</a>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr><th>Student</th><th>Month</th><th>Amount</th><th>Method</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for p in recent_payments %}
+                <tr>
+                    <td style="font-weight:600;font-size:14px;">{{ p.allocation.student.user.get_full_name }}</td>
+                    <td style="font-size:13px;">{{ p.month }}</td>
+                    <td style="font-weight:600;color:var(--success);">₹{{ p.amount }}</td>
+                    <td><span class="badge badge-info">{{ p.get_payment_method_display }}</span></td>
+                    <td>
+                        <span class="badge {% if p.status == 'paid' %}badge-success{% elif p.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
+                            {{ p.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center" style="padding:30px;color:var(--gray-400);">No payments recorded</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

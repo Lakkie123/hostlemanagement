@@ -1,0 +1,242 @@
+{% extends 'hostel_app/base.html' %}
+{% block title %}Register — HostelHub{% endblock %}
+{% block body %}
+
+<style>
+.register-layout {
+    min-height: calc(100vh - 68px - 60px);
+    padding: 48px 40px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.register-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    color: var(--navy);
+    margin-bottom: 10px;
+}
+
+.step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 40px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-400);
+}
+
+.step.active { color: var(--navy); }
+.step.done { color: var(--success); }
+
+.step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    background: var(--gray-200);
+    color: var(--gray-600);
+}
+
+.step.active .step-num { background: var(--navy); color: white; }
+.step.done .step-num { background: var(--success); color: white; }
+
+.step-line { width: 60px; height: 2px; background: var(--gray-200); margin: 0 8px; }
+.step-line.done { background: var(--success); }
+
+.section-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 28px 0 20px;
+}
+
+.section-divider span {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gold);
+    white-space: nowrap;
+}
+
+.section-divider::before, .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gray-200);
+}
+</style>
+
+<div class="register-layout">
+    <div class="register-header fade-in">
+        <div style="width:56px;height:56px;background:var(--navy);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:22px;color:var(--gold);">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <h1>Create Your Account</h1>
+        <p style="color:var(--gray-600);font-size:15px;">Register to access the hostel management system</p>
+    </div>
+
+    <div class="card fade-in fade-in-delay-1">
+        <div class="card-header">
+            <div>
+                <div class="card-title">Student Registration Form</div>
+                <div style="font-size:13px;color:var(--gray-600);margin-top:2px;">All fields are required unless marked optional</div>
+            </div>
+            <a href="{% url 'login' %}" class="btn btn-outline btn-sm">
+                <i class="fa-solid fa-arrow-left"></i> Back to Login
+            </a>
+        </div>
+
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <i class="fa-solid fa-exclamation-circle"></i>
+                    Please fix the errors below before submitting.
+                </div>
+                {% endif %}
+
+                <!-- Account Info -->
+                <div class="section-divider">
+                    <span><i class="fa-solid fa-key"></i> Account Information</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Username *</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                        <div style="color:var(--danger);font-size:12px;margin-top:4px;">{{ form.username.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address *</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div style="color:var(--danger);font-size:12px;margin-top:4px;">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password *</label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                        <div style="color:var(--danger);font-size:12px;margin-top:4px;">{{ form.password1.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password *</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                        <div style="color:var(--danger);font-size:12px;margin-top:4px;">{{ form.password2.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Personal Info -->
+                <div class="section-divider">
+                    <span><i class="fa-solid fa-user"></i> Personal Information</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">First Name *</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name *</label>
+                        {{ form.last_name }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Roll Number *</label>
+                        {{ form.roll_number }}
+                        {% if form.roll_number.errors %}
+                        <div style="color:var(--danger);font-size:12px;margin-top:4px;">{{ form.roll_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number *</label>
+                        {{ form.phone }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Gender *</label>
+                        {{ form.gender }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date of Birth *</label>
+                        {{ form.date_of_birth }}
+                    </div>
+                </div>
+
+                <!-- Academic Info -->
+                <div class="section-divider">
+                    <span><i class="fa-solid fa-graduation-cap"></i> Academic Information</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Course *</label>
+                        {{ form.course }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Year of Study *</label>
+                        {{ form.year_of_study }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Permanent Address *</label>
+                    {{ form.address }}
+                </div>
+
+                <!-- Guardian Info -->
+                <div class="section-divider">
+                    <span><i class="fa-solid fa-users"></i> Guardian Information</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Guardian Name *</label>
+                        {{ form.guardian_name }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Guardian Phone *</label>
+                        {{ form.guardian_phone }}
+                    </div>
+                </div>
+
+                <div style="background:rgba(201,162,39,0.08);border:1px solid rgba(201,162,39,0.2);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--gray-600);margin-bottom:24px;">
+                    <i class="fa-solid fa-info-circle" style="color:var(--gold);margin-right:8px;"></i>
+                    After registration, your account will be reviewed by the admin. You'll be notified once approved.
+                </div>
+
+                <button type="submit" class="btn btn-gold btn-lg" style="width:100%;justify-content:center;">
+                    <i class="fa-solid fa-check"></i> Complete Registration
+                </button>
+            </form>
+
+            <p style="text-align:center;margin-top:20px;font-size:14px;color:var(--gray-600);">
+                Already have an account?
+                <a href="{% url 'login' %}" style="color:var(--gold);font-weight:600;text-decoration:none;">Sign in here</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'hostel_app/admin/base_admin.html' %}
+{% block title %}{{ title }} — HostelHub{% endblock %}
+{% block admin_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">{{ title }}</div>
+        <div class="page-subtitle">Assign a room to a student</div>
+    </div>
+    <a href="{% url 'manage_allocations' %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+
+<div class="card fade-in fade-in-delay-1" style="max-width:700px;">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Student *</label>
+                    {{ form.student }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Room (Available only) *</label>
+                    {{ form.room }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Allocation Date *</label>
+                    {{ form.allocated_date }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Expected Vacate Date</label>
+                    {{ form.expected_vacate_date }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Monthly Rent (₹) *</label>
+                    {{ form.monthly_rent }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Security Deposit (₹)</label>
+                    {{ form.security_deposit }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                {{ form.notes }}
+            </div>
+            <div style="display:flex;gap:12px;">
+                <button type="submit" class="btn btn-gold"><i class="fa-solid fa-key"></i> Allocate Room</button>
+                <a href="{% url 'manage_allocations' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

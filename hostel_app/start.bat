@@ -1,0 +1,1 @@
+py -3.13 manage.py runserver

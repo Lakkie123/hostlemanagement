@@ -1,0 +1,50 @@
+{% extends 'hostel_app/admin/base_admin.html' %}
+{% block title %}Available Rooms — HostelHub{% endblock %}
+{% block admin_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">Available Rooms</div>
+        <div class="page-subtitle">{{ rooms|length }} room(s) available for allocation</div>
+    </div>
+    <a href="{% url 'add_allocation' %}" class="btn btn-gold"><i class="fa-solid fa-key"></i> Allocate Room</a>
+</div>
+
+<div class="room-grid fade-in fade-in-delay-1">
+    {% for room in rooms %}
+    <div class="room-card available">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+                <div class="room-number">{{ room.room_number }}</div>
+                <div class="room-type">{{ room.room_type.name }} · Floor {{ room.floor }}</div>
+            </div>
+            <span class="badge badge-success">Available</span>
+        </div>
+        <div style="margin-top:14px;font-size:14px;">
+            <strong style="color:var(--success);">₹{{ room.room_type.price_per_month }}/month</strong>
+            <span style="color:var(--gray-600);font-size:13px;"> · Capacity: {{ room.room_type.capacity }}</span>
+        </div>
+        <div class="room-amenities">
+            {% if room.has_ac %}<span class="amenity-tag"><i class="fa-solid fa-snowflake"></i> AC</span>{% endif %}
+            {% if room.has_wifi %}<span class="amenity-tag"><i class="fa-solid fa-wifi"></i> WiFi</span>{% endif %}
+            {% if room.has_attached_bathroom %}<span class="amenity-tag"><i class="fa-solid fa-shower"></i> Bath</span>{% endif %}
+            {% if room.has_tv %}<span class="amenity-tag"><i class="fa-solid fa-tv"></i> TV</span>{% endif %}
+        </div>
+        <div style="margin-top:14px;">
+            <a href="{% url 'add_allocation' %}?room={{ room.pk }}" class="btn btn-gold btn-sm" style="width:100%;justify-content:center;">
+                <i class="fa-solid fa-key"></i> Allocate This Room
+            </a>
+        </div>
+    </div>
+    {% empty %}
+    <div style="grid-column:1/-1;">
+        <div class="empty-state">
+            <i class="fa-solid fa-door-closed"></i>
+            <h3>No Available Rooms</h3>
+            <p>All rooms are currently occupied or under maintenance.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

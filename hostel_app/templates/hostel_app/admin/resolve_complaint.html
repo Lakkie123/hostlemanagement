@@ -1,0 +1,77 @@
+{% extends 'hostel_app/admin/base_admin.html' %}
+{% block title %}Resolve Complaint — HostelHub{% endblock %}
+{% block admin_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">Resolve Complaint</div>
+        <div class="page-subtitle">Update complaint status and add resolution notes</div>
+    </div>
+    <a href="{% url 'manage_complaints' %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+
+<div class="grid-2 fade-in fade-in-delay-1">
+    <!-- Complaint Details -->
+    <div class="card">
+        <div class="card-header"><div class="card-title">Complaint Details</div></div>
+        <div class="card-body">
+            <div style="margin-bottom:20px;">
+                <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:8px;">{{ complaint.subject }}</div>
+                <div style="display:flex;gap:8px;margin-bottom:16px;">
+                    <span class="badge badge-navy">{{ complaint.get_category_display }}</span>
+                    <span class="badge {% if complaint.priority == 'urgent' %}badge-danger{% elif complaint.priority == 'high' %}badge-warning{% else %}badge-gray{% endif %}">
+                        {{ complaint.get_priority_display }}
+                    </span>
+                    <span class="badge {% if complaint.status == 'open' %}badge-danger{% elif complaint.status == 'in_progress' %}badge-warning{% else %}badge-success{% endif %}">
+                        {{ complaint.get_status_display }}
+                    </span>
+                </div>
+                <div style="background:var(--gray-100);border-radius:10px;padding:16px;font-size:14px;color:var(--gray-800);line-height:1.7;">
+                    {{ complaint.description }}
+                </div>
+            </div>
+            <div style="display:grid;gap:10px;">
+                <div style="display:flex;justify-content:space-between;font-size:13px;border-bottom:1px solid var(--gray-200);padding-bottom:10px;">
+                    <span style="color:var(--gray-600);">Student</span>
+                    <span style="font-weight:600;">{{ complaint.student.user.get_full_name }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;border-bottom:1px solid var(--gray-200);padding-bottom:10px;">
+                    <span style="color:var(--gray-600);">Roll No.</span>
+                    <span style="font-weight:500;">{{ complaint.student.roll_number }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;">
+                    <span style="color:var(--gray-600);">Filed on</span>
+                    <span>{{ complaint.created_at|date:"d M Y, H:i" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolution Form -->
+    <div class="card">
+        <div class="card-header"><div class="card-title">Update Resolution</div></div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Update Status</label>
+                    <select name="status" class="form-control">
+                        <option value="in_progress" {% if complaint.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                        <option value="resolved" {% if complaint.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                        <option value="closed" {% if complaint.status == 'closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Resolution Notes *</label>
+                    <textarea name="resolution_notes" class="form-control" rows="5" placeholder="Describe what action was taken to resolve this complaint...">{{ complaint.resolution_notes }}</textarea>
+                </div>
+                <div style="display:flex;gap:12px;">
+                    <button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Update Status</button>
+                    <a href="{% url 'manage_complaints' %}" class="btn btn-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

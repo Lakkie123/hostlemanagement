@@ -1,0 +1,210 @@
+{% extends 'hostel_app/admin/base_admin.html' %}
+{% block title %}{{ student.user.get_full_name }} — HostelHub{% endblock %}
+{% block admin_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">{{ student.user.get_full_name }}</div>
+        <div class="page-subtitle">{{ student.roll_number }} · {{ student.course }} Year {{ student.year_of_study }}</div>
+    </div>
+    <div style="display:flex;gap:10px;">
+        {% if student.status == 'pending' %}
+        <a href="{% url 'approve_student' student.pk %}" class="btn btn-success btn-sm"><i class="fa-solid fa-check"></i> Approve Student</a>
+        {% endif %}
+        <a href="{% url 'manage_students' %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Back</a>
+    </div>
+</div>
+
+<div class="grid-2 mb-24 fade-in fade-in-delay-1">
+    <div class="card">
+        <div class="card-header"><div class="card-title">Personal Information</div></div>
+        <div class="card-body">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+                <div class="avatar" style="width:60px;height:60px;border-radius:16px;font-size:22px;">
+                    {{ student.user.first_name|first|upper }}{{ student.user.last_name|first|upper }}
+                </div>
+                <div>
+                    <div style="font-size:18px;font-weight:700;color:var(--navy);">{{ student.user.get_full_name }}</div>
+                    <div style="font-size:13px;color:var(--gray-600);">{{ student.user.email }}</div>
+                    <span class="badge {% if student.status == 'active' %}badge-success{% elif student.status == 'pending' %}badge-warning{% else %}badge-gray{% endif %}" style="margin-top:6px;">
+                        {{ student.get_status_display }}
+                    </span>
+                </div>
+            </div>
+            <div style="display:grid;gap:12px;">
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--gray-200);padding-bottom:10px;">
+                    <span style="font-size:13px;color:var(--gray-600);">Course</span>
+                    <span style="font-size:13px;font-weight:500;color:var(--navy);">{{ student.course }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--gray-200);padding-bottom:10px;">
+                    <span style="font-size:13px;color:var(--gray-600);">Year of Study</span>
+                    <span style="font-size:13px;font-weight:500;color:var(--navy);">Year {{ student.year_of_study }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--gray-200);padding-bottom:10px;">
+                    <span style="font-size:13px;color:var(--gray-600);">Username</span>
+                    <span style="font-size:13px;font-weight:500;color:var(--navy);">{{ student.user.username }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--gray-200);padding-bottom:10px;">
+                    <span style="font-size:13px;color:var(--gray-600);">Email</span>
+                    <span style="font-size:13px;font-weight:500;color:var(--navy);">{{ student.user.email }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--gray-200);padding-bottom:10px;">
+                    <span style="font-size:13px;color:var(--gray-600);">Phone</span>
+                    <span style="font-size:13px;font-weight:500;">{{ student.phone }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--gray-200);padding-bottom:10px;">
+                    <span style="font-size:13px;color:var(--gray-600);">Gender</span>
+                    <span style="font-size:13px;font-weight:500;">{{ student.get_gender_display }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--gray-200);padding-bottom:10px;">
+                    <span style="font-size:13px;color:var(--gray-600);">Date of Birth</span>
+                    <span style="font-size:13px;font-weight:500;">{{ student.date_of_birth|date:"d M Y"|default:"—" }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--gray-200);padding-bottom:10px;">
+                    <span style="font-size:13px;color:var(--gray-600);">Guardian</span>
+                    <span style="font-size:13px;font-weight:500;">{{ student.guardian_name }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="font-size:13px;color:var(--gray-600);">Guardian Phone</span>
+                    <span style="font-size:13px;font-weight:500;">{{ student.guardian_phone }}</span>
+                </div>
+            </div>
+            {% if student.address %}
+            <div class="divider"></div>
+            <div style="font-size:13px;color:var(--gray-600);">
+                <strong style="color:var(--navy);">Address:</strong><br>{{ student.address }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:20px;">
+        <!-- Current Allocation -->
+        <div class="card">
+            <div class="card-header"><div class="card-title">Current Room</div></div>
+            <div class="card-body">
+                {% with active=allocations|first %}
+                {% if active and active.status == 'active' %}
+                <div style="text-align:center;padding:16px 0;">
+                    <div style="font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--navy);">{{ active.room.room_number }}</div>
+                    <div style="color:var(--gray-600);font-size:14px;">{{ active.room.room_type.name }} · Floor {{ active.room.floor }}</div>
+                    <div style="margin-top:12px;">
+                        <span class="badge badge-success">Active Allocation</span>
+                    </div>
+                    <div style="margin-top:12px;font-size:14px;color:var(--gray-600);">
+                        Since {{ active.allocated_date|date:"d M Y" }} · ₹{{ active.monthly_rent }}/month
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state" style="padding:30px;">
+                    <i class="fa-solid fa-bed" style="font-size:28px;"></i>
+                    <p style="margin-top:10px;">No active room allocation</p>
+                    <a href="{% url 'add_allocation' %}" class="btn btn-gold btn-sm mt-16"><i class="fa-solid fa-key"></i> Allocate Room</a>
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="card">
+            <div class="card-header"><div class="card-title">Summary</div></div>
+            <div class="card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div style="background:var(--gray-100);border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:22px;font-weight:700;color:var(--navy);">{{ allocations|length }}</div>
+                        <div style="font-size:12px;color:var(--gray-600);">Total Allocations</div>
+                    </div>
+                    <div style="background:var(--gray-100);border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:22px;font-weight:700;color:var(--navy);">{{ complaints|length }}</div>
+                        <div style="font-size:12px;color:var(--gray-600);">Complaints Filed</div>
+                    </div>
+                    <div style="background:var(--gray-100);border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:22px;font-weight:700;color:var(--success);">{{ payments|length }}</div>
+                        <div style="font-size:12px;color:var(--gray-600);">Payments Made</div>
+                    </div>
+                    <div style="background:var(--gray-100);border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:22px;font-weight:700;color:var(--navy);">{{ student.year_of_study }}</div>
+                        <div style="font-size:12px;color:var(--gray-600);">Year of Study</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Allocation History -->
+<div class="card mb-24 fade-in fade-in-delay-2">
+    <div class="card-header"><div class="card-title">Allocation History</div></div>
+    <div class="table-wrapper">
+        <table>
+            <thead><tr><th>Room</th><th>From</th><th>To</th><th>Rent</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+                {% for alloc in allocations %}
+                <tr>
+                    <td><span class="badge badge-navy">{{ alloc.room.room_number }}</span> {{ alloc.room.room_type.name }}</td>
+                    <td>{{ alloc.allocated_date|date:"d M Y" }}</td>
+                    <td>{{ alloc.actual_vacate_date|date:"d M Y"|default:alloc.expected_vacate_date|date:"d M Y"|default:"—" }}</td>
+                    <td style="color:var(--success);font-weight:600;">₹{{ alloc.monthly_rent }}</td>
+                    <td><span class="badge {% if alloc.status == 'active' %}badge-success{% else %}badge-gray{% endif %}">{{ alloc.get_status_display }}</span></td>
+                    <td>
+                        {% if alloc.status == 'active' %}
+                        <a href="{% url 'vacate_allocation' alloc.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Mark as vacated?')"><i class="fa-solid fa-door-open"></i> Vacate</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center" style="padding:24px;color:var(--gray-400);">No allocation history</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Payment History -->
+<div class="card mb-24 fade-in">
+    <div class="card-header"><div class="card-title">Payment History</div></div>
+    <div class="table-wrapper">
+        <table>
+            <thead><tr><th>Month</th><th>Amount</th><th>Date</th><th>Method</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td style="font-weight:500;">{{ p.month }}</td>
+                    <td style="color:var(--success);font-weight:600;">₹{{ p.amount }}</td>
+                    <td>{{ p.payment_date|date:"d M Y" }}</td>
+                    <td><span class="badge badge-info">{{ p.get_payment_method_display }}</span></td>
+                    <td><span class="badge {% if p.status == 'paid' %}badge-success{% elif p.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">{{ p.get_status_display }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center" style="padding:24px;color:var(--gray-400);">No payment records</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Complaints -->
+<div class="card fade-in">
+    <div class="card-header"><div class="card-title">Complaint History</div></div>
+    <div class="table-wrapper">
+        <table>
+            <thead><tr><th>Subject</th><th>Category</th><th>Priority</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody>
+                {% for c in complaints %}
+                <tr>
+                    <td style="font-weight:500;font-size:14px;">{{ c.subject }}</td>
+                    <td>{{ c.get_category_display }}</td>
+                    <td><span class="badge {% if c.priority == 'urgent' %}badge-danger{% elif c.priority == 'high' %}badge-warning{% else %}badge-gray{% endif %}">{{ c.get_priority_display }}</span></td>
+                    <td><span class="badge {% if c.status == 'open' %}badge-danger{% elif c.status == 'in_progress' %}badge-warning{% elif c.status == 'resolved' %}badge-success{% else %}badge-gray{% endif %}">{{ c.get_status_display }}</span></td>
+                    <td>{{ c.created_at|date:"d M Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center" style="padding:24px;color:var(--gray-400);">No complaints filed</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

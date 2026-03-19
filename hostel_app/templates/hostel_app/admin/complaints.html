@@ -1,0 +1,81 @@
+{% extends 'hostel_app/admin/base_admin.html' %}
+{% block title %}Complaints — HostelHub{% endblock %}
+{% block admin_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">Complaint Management</div>
+        <div class="page-subtitle">View and resolve student complaints</div>
+    </div>
+</div>
+
+<div class="card mb-20 fade-in fade-in-delay-1">
+    <div class="card-body" style="padding:16px 24px;">
+        <form method="get" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+            <select name="status" class="form-control" style="width:auto;">
+                <option value="">All Status</option>
+                <option value="open" {% if status_filter == 'open' %}selected{% endif %}>Open</option>
+                <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
+                <option value="resolved" {% if status_filter == 'resolved' %}selected{% endif %}>Resolved</option>
+                <option value="closed" {% if status_filter == 'closed' %}selected{% endif %}>Closed</option>
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-filter"></i> Filter</button>
+            <a href="{% url 'manage_complaints' %}" class="btn btn-outline btn-sm">Clear</a>
+        </form>
+    </div>
+</div>
+
+<div class="card fade-in fade-in-delay-2">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr><th>Student</th><th>Subject</th><th>Category</th><th>Priority</th><th>Status</th><th>Date</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+                {% for c in complaints %}
+                <tr>
+                    <td>
+                        <div style="font-weight:600;font-size:14px;">{{ c.student.user.get_full_name }}</div>
+                        <div style="font-size:12px;color:var(--gray-400);">{{ c.student.roll_number }}</div>
+                    </td>
+                    <td style="max-width:200px;">
+                        <div style="font-size:14px;font-weight:500;">{{ c.subject|truncatechars:40 }}</div>
+                        <div style="font-size:12px;color:var(--gray-400);">{{ c.description|truncatechars:50 }}</div>
+                    </td>
+                    <td><span class="badge badge-navy">{{ c.get_category_display }}</span></td>
+                    <td>
+                        <span class="badge {% if c.priority == 'urgent' %}badge-danger{% elif c.priority == 'high' %}badge-warning{% elif c.priority == 'medium' %}badge-info{% else %}badge-gray{% endif %}">
+                            {{ c.get_priority_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge {% if c.status == 'open' %}badge-danger{% elif c.status == 'in_progress' %}badge-warning{% elif c.status == 'resolved' %}badge-success{% else %}badge-gray{% endif %}">
+                            {{ c.get_status_display }}
+                        </span>
+                    </td>
+                    <td style="font-size:13px;color:var(--gray-600);">{{ c.created_at|date:"d M Y" }}</td>
+                    <td>
+                        {% if c.status != 'closed' and c.status != 'resolved' %}
+                        <a href="{% url 'resolve_complaint' c.pk %}" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-check"></i> Resolve
+                        </a>
+                        {% else %}
+                        <span style="font-size:13px;color:var(--gray-400);">Done</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7">
+                    <div class="empty-state">
+                        <i class="fa-solid fa-face-smile"></i>
+                        <h3>No Complaints</h3>
+                        <p>All students are happy! No complaints found.</p>
+                    </div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

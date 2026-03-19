@@ -1,0 +1,105 @@
+{% extends 'hostel_app/student/base_student.html' %}
+{% block title %}My Room — HostelHub{% endblock %}
+{% block student_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">My Room</div>
+        <div class="page-subtitle">Your current room allocation details</div>
+    </div>
+</div>
+
+{% if allocation %}
+<div class="grid-2 fade-in fade-in-delay-1">
+    <div class="card">
+        <div class="card-header"><div class="card-title">Room Information</div></div>
+        <div class="card-body">
+            <div style="text-align:center;padding:24px 0;">
+                <div style="font-family:'Playfair Display',serif;font-size:64px;font-weight:800;color:var(--navy);line-height:1;">{{ allocation.room.room_number }}</div>
+                <div style="color:var(--gray-600);margin-top:8px;font-size:15px;">{{ allocation.room.room_type.name }}</div>
+                <div style="color:var(--gray-400);font-size:14px;">Floor {{ allocation.room.floor }}</div>
+            </div>
+            <div class="divider"></div>
+            <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-bottom:20px;">
+                {% if allocation.room.has_ac %}
+                <div style="display:flex;align-items:center;gap:8px;background:rgba(34,114,195,0.08);color:var(--info);padding:8px 14px;border-radius:10px;font-size:14px;">
+                    <i class="fa-solid fa-snowflake"></i> Air Conditioning
+                </div>{% endif %}
+                {% if allocation.room.has_wifi %}
+                <div style="display:flex;align-items:center;gap:8px;background:rgba(26,158,110,0.08);color:var(--success);padding:8px 14px;border-radius:10px;font-size:14px;">
+                    <i class="fa-solid fa-wifi"></i> High-Speed WiFi
+                </div>{% endif %}
+                {% if allocation.room.has_attached_bathroom %}
+                <div style="display:flex;align-items:center;gap:8px;background:rgba(10,22,40,0.06);color:var(--navy);padding:8px 14px;border-radius:10px;font-size:14px;">
+                    <i class="fa-solid fa-shower"></i> Attached Bathroom
+                </div>{% endif %}
+                {% if allocation.room.has_tv %}
+                <div style="display:flex;align-items:center;gap:8px;background:rgba(224,124,31,0.08);color:var(--warning);padding:8px 14px;border-radius:10px;font-size:14px;">
+                    <i class="fa-solid fa-tv"></i> Television
+                </div>{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><div class="card-title">Allocation Details</div></div>
+        <div class="card-body">
+            <div style="display:grid;gap:14px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--gray-200);">
+                    <span style="font-size:14px;color:var(--gray-600);">Status</span>
+                    <span class="badge badge-success"><i class="fa-solid fa-check-circle"></i> {{ allocation.get_status_display }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--gray-200);">
+                    <span style="font-size:14px;color:var(--gray-600);">Room Type</span>
+                    <span style="font-weight:600;color:var(--navy);">{{ allocation.room.room_type.name }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--gray-200);">
+                    <span style="font-size:14px;color:var(--gray-600);">Monthly Rent</span>
+                    <span style="font-weight:700;font-size:16px;color:var(--success);">₹{{ allocation.monthly_rent }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--gray-200);">
+                    <span style="font-size:14px;color:var(--gray-600);">Security Deposit</span>
+                    <span style="font-weight:600;">₹{{ allocation.security_deposit }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--gray-200);">
+                    <span style="font-size:14px;color:var(--gray-600);">Allocated Date</span>
+                    <span style="font-weight:500;">{{ allocation.allocated_date|date:"d M Y" }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="font-size:14px;color:var(--gray-600);">Expected Vacate</span>
+                    <span style="font-weight:500;">{{ allocation.expected_vacate_date|date:"d M Y"|default:"Not Set" }}</span>
+                </div>
+            </div>
+            {% if allocation.notes %}
+            <div class="divider"></div>
+            <div style="background:var(--gray-100);border-radius:10px;padding:14px;font-size:13px;color:var(--gray-600);">
+                <strong style="color:var(--navy);">Notes:</strong> {{ allocation.notes }}
+            </div>
+            {% endif %}
+            <div style="margin-top:20px;display:flex;gap:10px;">
+                <a href="{% url 'my_payments' %}" class="btn btn-gold" style="flex:1;justify-content:center;">
+                    <i class="fa-solid fa-indian-rupee-sign"></i> View Payments
+                </a>
+                <a href="{% url 'submit_complaint' %}" class="btn btn-outline" style="flex:1;justify-content:center;">
+                    <i class="fa-solid fa-headset"></i> Report Issue
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card fade-in fade-in-delay-1">
+    <div class="card-body">
+        <div class="empty-state">
+            <i class="fa-solid fa-bed"></i>
+            <h3>No Room Allocated</h3>
+            <p>You haven't been assigned a room yet. Please contact the hostel administrator.</p>
+            <a href="{% url 'submit_complaint' %}" class="btn btn-gold mt-16">
+                <i class="fa-solid fa-headset"></i> Contact Admin
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

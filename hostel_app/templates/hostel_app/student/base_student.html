@@ -1,0 +1,55 @@
+{% extends 'hostel_app/base.html' %}
+{% block body %}
+<div class="layout-wrapper">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-label">My Account</div>
+        <a href="{% url 'student_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
+            <i class="fa-solid fa-chart-simple"></i> Dashboard
+        </a>
+        <a href="{% url 'student_profile' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_profile' %}active{% endif %}">
+            <i class="fa-solid fa-user"></i> My Profile
+        </a>
+
+        <div class="sidebar-label">My Room</div>
+        <a href="{% url 'my_room' %}" class="sidebar-link {% if request.resolver_match.url_name == 'my_room' %}active{% endif %}">
+            <i class="fa-solid fa-bed"></i> Room Details
+        </a>
+        
+        <a href="{% url 'pay_fee' %}" class="sidebar-link" style="background:rgba(201,162,39,0.12);color:var(--gold);">
+    <i class="fa-solid fa-bolt"></i> ⚡ Pay Fee Now
+</a>
+        <a href="{% url 'my_payments' %}" class="sidebar-link {% if request.resolver_match.url_name == 'my_payments' %}active{% endif %}">
+            <i class="fa-solid fa-indian-rupee-sign"></i> Fee Payments
+        </a>
+
+        <div class="sidebar-label">Support</div>
+        <a href="{% url 'submit_complaint' %}" class="sidebar-link {% if request.resolver_match.url_name == 'submit_complaint' %}active{% endif %}">
+            <i class="fa-solid fa-plus-circle"></i> New Complaint
+        </a>
+        <a href="{% url 'my_complaints' %}" class="sidebar-link {% if request.resolver_match.url_name == 'my_complaints' %}active{% endif %}">
+            <i class="fa-solid fa-triangle-exclamation"></i> My Complaints
+        </a>
+
+        <div class="sidebar-label">Visitors</div>
+        <a href="{% url 'add_visitor' %}" class="sidebar-link {% if request.resolver_match.url_name == 'add_visitor' %}active{% endif %}">
+            <i class="fa-solid fa-user-plus"></i> Register Visitor
+        </a>
+        <a href="{% url 'my_visitors' %}" class="sidebar-link {% if request.resolver_match.url_name == 'my_visitors' %}active{% endif %}">
+            <i class="fa-solid fa-people-group"></i> Visitor Log
+        </a>
+
+        <div class="sidebar-label" style="margin-top:20px;"></div>
+        <a href="{% url 'home' %}" class="sidebar-link">
+            <i class="fa-solid fa-house"></i> Home
+        </a>
+        <a href="{% url 'logout' %}" class="sidebar-link" style="color:rgba(217,79,79,0.8);">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+    </aside>
+
+    <div class="main-content">
+        {% block student_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'hostel_app/admin/base_admin.html' %}
+{% block title %}Visitors — HostelHub{% endblock %}
+{% block admin_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">Visitor Log</div>
+        <div class="page-subtitle">All registered hostel visitors</div>
+    </div>
+</div>
+
+<div class="card fade-in fade-in-delay-1">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr><th>Visitor</th><th>Student</th><th>Relation</th><th>Purpose</th><th>Check In</th><th>Check Out</th><th>ID Proof</th></tr>
+            </thead>
+            <tbody>
+                {% for v in visitors %}
+                <tr>
+                    <td>
+                        <div style="font-weight:600;font-size:14px;">{{ v.visitor_name }}</div>
+                        <div style="font-size:12px;color:var(--gray-400);">{{ v.visitor_phone }}</div>
+                    </td>
+                    <td>
+                        <div style="font-size:14px;">{{ v.student.user.get_full_name }}</div>
+                        <div style="font-size:12px;color:var(--gray-400);">{{ v.student.roll_number }}</div>
+                    </td>
+                    <td style="font-size:13px;">{{ v.relation }}</td>
+                    <td style="font-size:13px;max-width:160px;">{{ v.purpose|truncatechars:40 }}</td>
+                    <td style="font-size:13px;">{{ v.check_in|date:"d M Y, H:i" }}</td>
+                    <td style="font-size:13px;">{{ v.check_out|date:"d M Y, H:i"|default:"—" }}</td>
+                    <td style="font-size:13px;">{{ v.id_proof|default:"—" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7">
+                    <div class="empty-state">
+                        <i class="fa-solid fa-person-walking-arrow-right"></i>
+                        <h3>No Visitors Registered</h3>
+                        <p>Visitor logs will appear here when students register visitors.</p>
+                    </div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

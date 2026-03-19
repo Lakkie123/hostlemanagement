@@ -1,0 +1,25 @@
+{% extends 'hostel_app/student/base_student.html' %}
+{% block title %}Register Visitor — HostelHub{% endblock %}
+{% block student_content %}
+<div class="page-header fade-in">
+    <div><div class="page-title">Register Visitor</div><div class="page-subtitle">Log a visitor entry for the hostel records</div></div>
+    <a href="{% url 'my_visitors' %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-list"></i> Visitor Log</a>
+</div>
+<div class="card fade-in fade-in-delay-1" style="max-width:600px;">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group"><label class="form-label">Visitor Name *</label>{{ form.visitor_name }}</div>
+                <div class="form-group"><label class="form-label">Visitor Phone *</label>{{ form.visitor_phone }}</div>
+                <div class="form-group"><label class="form-label">Relation *</label>{{ form.relation }}</div>
+                <div class="form-group"><label class="form-label">ID Proof Type</label>{{ form.id_proof }}</div>
+            </div>
+            <div class="form-group"><label class="form-label">Purpose of Visit *</label>{{ form.purpose }}</div>
+            <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center;">
+                <i class="fa-solid fa-user-check"></i> Register Visitor
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

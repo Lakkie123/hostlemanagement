@@ -1,0 +1,32 @@
+{% extends 'hostel_app/student/base_student.html' %}
+{% block title %}Submit Complaint — HostelHub{% endblock %}
+{% block student_content %}
+<div class="page-header fade-in">
+    <div><div class="page-title">Submit Complaint</div><div class="page-subtitle">Report an issue and our team will respond promptly</div></div>
+    <a href="{% url 'my_complaints' %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-list"></i> My Complaints</a>
+</div>
+<div class="card fade-in fade-in-delay-1" style="max-width:640px;">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Category *</label>{{ form.category }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priority *</label>{{ form.priority }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Subject *</label>{{ form.subject }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description *</label>{{ form.description }}
+            </div>
+            <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center;">
+                <i class="fa-solid fa-paper-plane"></i> Submit Complaint
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

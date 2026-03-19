@@ -1,0 +1,63 @@
+{% extends 'hostel_app/admin/base_admin.html' %}
+{% block title %}Record Fee Payment — HostelHub{% endblock %}
+{% block admin_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">Record Fee Payment</div>
+        <div class="page-subtitle">Add a new fee payment record</div>
+    </div>
+    <a href="{% url 'manage_fees' %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+
+<div class="card fade-in fade-in-delay-1" style="max-width:700px;">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Allocation (Student - Room) *</label>
+                {{ form.allocation }}
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Month *</label>
+                    {{ form.month }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Amount (₹) *</label>
+                    {{ form.amount }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Payment Date *</label>
+                    {{ form.payment_date }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Due Date *</label>
+                    {{ form.due_date }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Payment Method *</label>
+                    {{ form.payment_method }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status *</label>
+                    {{ form.status }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Transaction ID (Optional)</label>
+                {{ form.transaction_id }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                {{ form.notes }}
+            </div>
+            <div style="display:flex;gap:12px;">
+                <button type="submit" class="btn btn-gold"><i class="fa-solid fa-check"></i> Save Record</button>
+                <a href="{% url 'manage_fees' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

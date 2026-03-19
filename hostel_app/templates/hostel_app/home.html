@@ -1,0 +1,295 @@
+{% extends 'hostel_app/base.html' %}
+{% load extras %}
+{% block title %}HostelHub — Premium Student Living{% endblock %}
+{% block body %}
+
+<style>
+.hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 60%, #1e3a5f 100%);
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 80px 60px;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a227' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.hero-content {
+    max-width: 650px;
+    position: relative;
+    z-index: 1;
+    animation: fadeInUp 0.8s ease;
+}
+
+.hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(201,162,39,0.15);
+    border: 1px solid rgba(201,162,39,0.3);
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 99px;
+    margin-bottom: 24px;
+}
+
+.hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 56px;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 20px;
+}
+
+.hero h1 span { color: var(--gold); }
+
+.hero p {
+    font-size: 18px;
+    color: rgba(255,255,255,0.7);
+    max-width: 480px;
+    margin-bottom: 40px;
+    line-height: 1.7;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 48px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+}
+
+.hero-stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--gold);
+}
+
+.hero-stat-label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+}
+
+.hero-visual {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 400px;
+    opacity: 0.12;
+}
+
+/* Sections */
+.section { padding: 80px 60px; }
+.section-alt { background: var(--white); }
+
+.section-tag {
+    display: inline-block;
+    background: rgba(201,162,39,0.12);
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 6px;
+    margin-bottom: 14px;
+}
+
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 16px;
+}
+
+.section-sub {
+    color: var(--gray-600);
+    font-size: 16px;
+    max-width: 520px;
+    line-height: 1.7;
+}
+
+/* Facilities */
+.facilities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 48px;
+}
+
+.facility-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.facility-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--navy), var(--gold));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+}
+
+.facility-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+.facility-card:hover::before { transform: scaleX(1); }
+
+.facility-icon {
+    width: 52px; height: 52px;
+    background: var(--navy);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    color: var(--gold);
+    margin-bottom: 18px;
+}
+
+.facility-name {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 8px;
+}
+
+.facility-desc { color: var(--gray-600); font-size: 14px; line-height: 1.6; }
+.facility-timing { margin-top: 12px; font-size: 12px; color: var(--gray-400); }
+.facility-timing i { margin-right: 4px; }
+
+/* Notices Section */
+.notices-list { margin-top: 40px; }
+
+/* CTA */
+.cta-section {
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    padding: 80px 60px;
+    text-align: center;
+    color: white;
+}
+.cta-section h2 { font-family:'Playfair Display',serif; font-size:36px; margin-bottom:16px; }
+.cta-section p { color:rgba(255,255,255,0.7); font-size:17px; margin-bottom:40px; }
+.cta-buttons { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+</style>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-tag"><i class="fa-solid fa-star"></i> Premium Student Living</div>
+        <h1>Your Home,<br>Away From <span>Home</span></h1>
+        <p>Experience comfortable, safe, and well-equipped hostel living designed for focused learning and vibrant community life.</p>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+            <a href="{% url 'register' %}" class="btn btn-gold btn-lg"><i class="fa-solid fa-user-plus"></i> Register Now</a>
+            <a href="{% url 'login' %}" class="btn btn-lg" style="background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.2);">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> Login
+            </a>
+        </div>
+        <div class="hero-stats">
+            <div>
+                <div class="hero-stat-value">{{ total_rooms }}+</div>
+                <div class="hero-stat-label">Total Rooms</div>
+            </div>
+            <div>
+                <div class="hero-stat-value">{{ available_rooms }}</div>
+                <div class="hero-stat-label">Available Now</div>
+            </div>
+            <div>
+                <div class="hero-stat-value">{{ total_students }}+</div>
+                <div class="hero-stat-label">Happy Students</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Decorative building icon -->
+    <div style="position:absolute;right:80px;top:50%;transform:translateY(-50%);font-size:220px;color:rgba(201,162,39,0.07);pointer-events:none;">
+        <i class="fa-solid fa-building"></i>
+    </div>
+</section>
+
+<!-- FACILITIES -->
+<section class="section">
+    <div class="section-tag">What We Offer</div>
+    <h2 class="section-title">World-Class Facilities</h2>
+    <p class="section-sub">Everything you need for a comfortable and productive student life, all under one roof.</p>
+
+    <div class="facilities-grid">
+        {% if facilities %}
+            {% for facility in facilities %}
+            <div class="facility-card fade-in" style="animation-delay:{{ forloop.counter0 }}00ms">
+                <div class="facility-icon"><i class="fa-solid {{ facility.icon }}"></i></div>
+                <div class="facility-name">{{ facility.name }}</div>
+                <div class="facility-desc">{{ facility.description }}</div>
+                {% if facility.timing %}
+                <div class="facility-timing"><i class="fa-regular fa-clock"></i> {{ facility.timing }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <!-- Default facilities if none exist -->
+            {% for item in "wifi,food,security,study,laundry,gym"|split:"," %}
+            <div class="facility-card fade-in">
+                <div class="facility-icon"><i class="fa-solid fa-check"></i></div>
+                <div class="facility-name">Premium Facility</div>
+                <div class="facility-desc">Top-notch facilities designed for student comfort and productivity.</div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</section>
+
+<!-- NOTICES -->
+{% if notices %}
+<section class="section section-alt">
+    <div class="section-tag">Stay Updated</div>
+    <h2 class="section-title">Latest Notices</h2>
+    <div class="notices-list" style="margin-top:32px;max-width:720px;">
+        {% for notice in notices %}
+        <div class="notice-card {{ notice.category }}">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                <div class="notice-title">{{ notice.title }}</div>
+                <span class="badge badge-{% if notice.category == 'urgent' %}danger{% elif notice.category == 'event' %}success{% elif notice.category == 'fee' %}warning{% else %}navy{% endif %}">
+                    {{ notice.get_category_display }}
+                </span>
+            </div>
+            <div class="notice-date"><i class="fa-regular fa-calendar"></i> {{ notice.created_at|date:"d M Y" }}</div>
+            <div class="notice-content">{{ notice.content|truncatewords:30 }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="section-tag" style="background:rgba(201,162,39,0.2);">Get Started Today</div>
+    <h2>Ready to Move In?</h2>
+    <p>Join our growing community of students enjoying premium hostel living.</p>
+    <div class="cta-buttons">
+        <a href="{% url 'register' %}" class="btn btn-gold btn-lg"><i class="fa-solid fa-user-plus"></i> Register as Student</a>
+        <a href="{% url 'login' %}" class="btn btn-lg" style="background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.3);">
+            <i class="fa-solid fa-key"></i> Admin Login
+        </a>
+    </div>
+</section>
+
+{% endblock %}

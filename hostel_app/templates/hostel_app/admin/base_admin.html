@@ -1,0 +1,68 @@
+{% extends 'hostel_app/base.html' %}
+{% block body %}
+<div class="layout-wrapper">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-label">Overview</div>
+        <a href="{% url 'admin_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+            <i class="fa-solid fa-chart-pie"></i> Dashboard
+        </a>
+
+        <div class="sidebar-label">Rooms</div>
+        <a href="{% url 'manage_rooms' %}" class="sidebar-link {% if 'room' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-bed"></i> Manage Rooms
+        </a>
+        <a href="{% url 'available_rooms' %}" class="sidebar-link">
+            <i class="fa-solid fa-door-open"></i> Available Rooms
+        </a>
+        <a href="{% url 'add_room' %}" class="sidebar-link">
+            <i class="fa-solid fa-plus"></i> Add Room
+        </a>
+
+        <div class="sidebar-label">Students</div>
+        <a href="{% url 'manage_students' %}" class="sidebar-link {% if 'student' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-users"></i> All Students
+        </a>
+        <a href="{% url 'manage_students' %}?status=pending" class="sidebar-link">
+            <i class="fa-solid fa-user-clock"></i> Pending Approvals
+        </a>
+
+        <div class="sidebar-label">Operations</div>
+        <a href="{% url 'manage_allocations' %}" class="sidebar-link {% if 'allocation' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-key"></i> Room Allocations
+        </a>
+        <a href="{% url 'manage_fees' %}" class="sidebar-link {% if 'fee' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-indian-rupee-sign"></i> Fee Management
+        </a>
+        <a href="{% url 'pending_verifications' %}" class="sidebar-link"
+   style="color:#e07c1f;">
+    <i class="fa-solid fa-clock"></i> Verify Payments
+</a>
+
+        <a href="{% url 'manage_complaints' %}" class="sidebar-link {% if 'complaint' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-triangle-exclamation"></i> Complaints
+        </a>
+        <a href="{% url 'manage_visitors' %}" class="sidebar-link {% if 'visitor' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-person-walking-arrow-right"></i> Visitors
+        </a>
+
+        <div class="sidebar-label">Communication</div>
+        <a href="{% url 'manage_notices' %}" class="sidebar-link {% if 'notice' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-bullhorn"></i> Notices
+        </a>
+
+        <div class="sidebar-label" style="margin-top:20px;"></div>
+        <a href="{% url 'home' %}" class="sidebar-link">
+            <i class="fa-solid fa-house"></i> View Website
+        </a>
+        <a href="{% url 'logout' %}" class="sidebar-link" style="color:rgba(217,79,79,0.8);">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main-content">
+        {% block admin_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

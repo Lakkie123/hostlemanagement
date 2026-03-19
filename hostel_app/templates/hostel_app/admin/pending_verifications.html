@@ -1,0 +1,415 @@
+{% extends 'hostel_app/admin/base_admin.html' %}
+{% block title %}Payment Verification — HostelHub{% endblock %}
+{% block admin_content %}
+
+<style>
+.verify-card {
+    background: white;
+    border-radius: 16px;
+    border: 2px solid #e8ecf4;
+    overflow: hidden;
+    margin-bottom: 16px;
+    transition: all 0.28s;
+    box-shadow: 0 4px 24px rgba(10,22,40,0.08);
+}
+.verify-card:hover { box-shadow: 0 8px 40px rgba(10,22,40,0.14); transform: translateY(-2px); }
+
+.verify-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.student-info { display: flex; align-items: center; gap: 14px; }
+.student-avatar {
+    width: 46px; height: 46px;
+    background: #0a1628; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: #c9a227; flex-shrink: 0;
+}
+.student-name { font-size: 16px; font-weight: 700; color: #0a1628; }
+.student-meta { font-size: 13px; color: #5a6478; margin-top: 2px; }
+
+.amount-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; font-weight: 800; color: #1a9e6e;
+}
+
+.txn-box {
+    background: #f4f6fa;
+    border: 1.5px solid #e8ecf4;
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin: 0 24px 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+}
+.txn-field label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    color: #9ba4b8; display: block; margin-bottom: 4px;
+}
+.txn-field span {
+    font-size: 14px; font-weight: 600; color: #0a1628;
+}
+.txn-id-val {
+    font-family: monospace;
+    background: #f4f6fa;
+    color: #0a1628;
+    border: 2px solid #c9a227;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.action-bar {
+    padding: 14px 24px;
+    background: #f4f6fa;
+    border-top: 1px solid #e8ecf4;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(10,22,40,0.6);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+    background: white;
+    border-radius: 20px;
+    padding: 32px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 20px 60px rgba(10,22,40,0.3);
+    animation: popIn 0.25s ease;
+}
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.empty-verify {
+    text-align: center;
+    padding: 80px 20px;
+    color: #9ba4b8;
+}
+.empty-verify i { font-size: 56px; display: block; margin-bottom: 16px; }
+.empty-verify h3 { color: #5a6478; font-size: 20px; margin-bottom: 8px; }
+</style>
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">Payment Verification</div>
+        <div class="page-subtitle">{{ payments|length }} payment(s) waiting for your approval</div>
+    </div>
+    <div style="display:flex;gap:10px;">
+        <a href="{% url 'manage_fees' %}" class="btn btn-outline btn-sm">
+            <i class="fa-solid fa-list"></i> All Fees
+        </a>
+    </div>
+</div>
+
+{% if payments %}
+
+<!-- Summary bar -->
+<div class="card mb-24 fade-in fade-in-delay-1">
+    <div class="card-body" style="padding:16px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:40px;height:40px;background:rgba(224,124,31,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                <i class="fa-solid fa-clock" style="color:var(--warning);"></i>
+            </div>
+            <div>
+                <div style="font-size:20px;font-weight:700;font-family:'Playfair Display',serif;color:var(--navy);">{{ payments|length }}</div>
+                <div style="font-size:12px;color:var(--gray-600);">Pending Payments</div>
+            </div>
+        </div>
+        <div style="color:var(--gray-400);font-size:13px;">
+            <i class="fa-solid fa-info-circle"></i>
+            Each payment mein Transaction ID check karo, phir Approve ya Reject karo.
+        </div>
+        <div style="margin-left:auto;">
+            <span class="badge badge-warning" style="padding:8px 14px;font-size:13px;">
+                <i class="fa-solid fa-hourglass-half"></i> Needs Action
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Cards -->
+{% for payment in payments %}
+<div class="verify-card fade-in" style="animation-delay:{{ forloop.counter0 }}00ms;">
+
+    <!-- Student Info + Amount + Date -->
+    <div class="verify-card-top">
+        <div class="student-info">
+            <div class="student-avatar">
+                {{ payment.allocation.student.user.first_name|first|upper }}{{ payment.allocation.student.user.last_name|first|upper }}
+            </div>
+            <div>
+                <div class="student-name">{{ payment.allocation.student.user.get_full_name }}</div>
+                <div class="student-meta">
+                    Roll: {{ payment.allocation.student.roll_number }} &nbsp;·&nbsp;
+                    Room {{ payment.allocation.room.room_number }}
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:center;">
+            <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray-600);margin-bottom:4px;">{{ payment.month }}</div>
+            <div class="amount-big">₹{{ payment.amount }}</div>
+        </div>
+
+        <div style="text-align:right;">
+            <div style="font-size:12px;color:var(--gray-400);">Submitted on</div>
+            <div style="font-size:14px;font-weight:600;color:var(--navy);">{{ payment.created_at|date:"d M Y" }}</div>
+            <div style="font-size:12px;color:var(--gray-400);">{{ payment.created_at|date:"H:i" }}</div>
+        </div>
+    </div>
+
+    <!-- Transaction Details -->
+    <div class="txn-box">
+        <div class="txn-field">
+            <label>Transaction ID</label>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span class="txn-id-val">{{ payment.transaction_id|default:"Not Provided" }}</span>
+                {% if payment.transaction_id %}
+                <button
+                    onmousedown="this.style.transform='scale(0.92)';this.style.background='#c9a227';this.style.color='#0a1628';"
+                    onmouseup="this.style.transform='scale(1)';"
+                    onclick="copyTxn(this, '{{ payment.transaction_id }}')"
+                    style="background:none; border:2px solid #c9a227; color:#c9a227; padding:5px 12px; border-radius:6px; cursor:pointer; font-size:13px; font-weight:700; transition:all 0.1s;">
+                    <i class="fa-regular fa-copy"></i> Copy
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        <div class="txn-field">
+            <label>Payment Method</label>
+            <span>{{ payment.get_payment_method_display }}</span>
+        </div>
+        <div class="txn-field">
+            <label>Due Date</label>
+            <span>{{ payment.due_date|date:"d M Y" }}</span>
+        </div>
+        {% if payment.notes %}
+        <div class="txn-field" style="grid-column:1/-1;">
+            <label>Student Note</label>
+            <span>{{ payment.notes }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Bank Slip -->
+    {% if payment.slip_image %}
+    <div style="margin:0 24px 20px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#9ba4b8;margin-bottom:10px;">
+            <i class="fa-solid fa-image"></i> Bank Deposit Slip
+        </div>
+        <div style="position:relative;display:inline-block;width:100%;">
+            <img src="{{ payment.slip_image.url }}" alt="Bank Slip"
+                 style="width:100%;max-height:320px;object-fit:contain;border-radius:12px;border:2px solid #c9a227;cursor:pointer;"
+                 onclick="openSlip('{{ payment.slip_image.url }}')">
+            <a href="{{ payment.slip_image.url }}" target="_blank"
+               style="position:absolute;top:10px;right:10px;background:#0a1628;color:#c9a227;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">
+                <i class="fa-solid fa-expand"></i> Full Size
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div style="margin:0 24px 20px;background:rgba(217,79,79,0.06);border:1.5px dashed #d94f4f;border-radius:10px;padding:14px 18px;font-size:13px;color:#d94f4f;">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        Student ne koi slip upload nahi ki — Transaction ID se verify karo.
+    </div>
+    {% endif %}
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+        <div style="font-size:13px;color:var(--gray-600);flex:1;">
+            <i class="fa-solid fa-shield-halved" style="color:var(--gold);"></i>
+            Transaction ID verify karo UPI app / bank se, phir approve karo.
+        </div>
+        <button type="button" class="btn btn-success"
+                onclick="openApprove({{ payment.pk }}, '{{ payment.allocation.student.user.get_full_name }}', '{{ payment.amount }}', '{{ payment.month }}', '{{ payment.transaction_id }}')">
+            <i class="fa-solid fa-check-circle"></i> Approve ✓
+        </button>
+        <button type="button" class="btn btn-danger"
+                onclick="openReject({{ payment.pk }}, '{{ payment.allocation.student.user.get_full_name }}', '{{ payment.amount }}')">
+            <i class="fa-solid fa-xmark-circle"></i> Reject ✗
+        </button>
+    </div>
+
+</div>
+{% endfor %}
+
+{% else %}
+
+<div class="card fade-in fade-in-delay-1">
+    <div class="card-body">
+        <div class="empty-verify">
+            <i class="fa-solid fa-circle-check" style="color:var(--success);"></i>
+            <h3>Sab Clear! 🎉</h3>
+            <p>Koi pending payment nahi hai. Sab verify ho gayi.</p>
+            <a href="{% url 'manage_fees' %}" class="btn btn-primary" style="margin-top:20px;">
+                <i class="fa-solid fa-list"></i> View All Payments
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+<!-- Reject Modal -->
+<div class="modal-overlay" id="rejectModal">
+    <div class="modal-box">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+            <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--navy);">Payment Reject Karo</div>
+            <button onclick="closeReject()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--gray-400);">✕</button>
+        </div>
+        <div id="reject-info" style="background:rgba(217,79,79,0.08);border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:14px;color:var(--danger);font-weight:600;"></div>
+        <form method="post" id="rejectForm" action="">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reject">
+            <div class="form-group">
+                <label class="form-label">Reject Reason *</label>
+                <select name="reject_reason" class="form-control" required>
+                    <option value="">-- Reason chuno --</option>
+                    <option value="Transaction ID galat hai">Transaction ID galat hai</option>
+                    <option value="Transaction ID already use ho chuka hai">Txn ID already use ho chuka hai</option>
+                    <option value="Amount mismatch hai">Amount mismatch hai</option>
+                    <option value="Payment nahi mili bank mein">Payment nahi mili bank mein</option>
+                    <option value="Duplicate submission">Duplicate submission</option>
+                    <option value="Other">Other reason</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Additional Note</label>
+                <textarea name="notes" class="form-control" rows="3" placeholder="Student ko kya batana hai..."></textarea>
+            </div>
+            <div style="display:flex;gap:12px;">
+                <button type="submit" class="btn btn-danger" style="flex:1;justify-content:center;">
+                    <i class="fa-solid fa-xmark"></i> Reject Payment
+                </button>
+                <button type="button" onclick="closeReject()" class="btn btn-outline" style="flex:1;justify-content:center;">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Approve Modal -->
+<div class="modal-overlay" id="approveModal">
+    <div class="modal-box">
+        <div style="text-align:center;padding:10px 0 20px;">
+            <div style="width:64px;height:64px;background:rgba(26,158,110,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                <i class="fa-solid fa-circle-check" style="font-size:28px;color:#1a9e6e;"></i>
+            </div>
+            <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#0a1628;margin-bottom:8px;">
+                Payment Approve Karo?
+            </div>
+            <div style="font-size:14px;color:#5a6478;" id="approve-student-name"></div>
+        </div>
+        <div style="background:#f4f6fa;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:grid;gap:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:14px;border-bottom:1px solid #e8ecf4;padding-bottom:10px;">
+                <span style="color:#5a6478;">Month</span>
+                <span style="font-weight:700;color:#0a1628;" id="approve-month"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:14px;border-bottom:1px solid #e8ecf4;padding-bottom:10px;">
+                <span style="color:#5a6478;">Amount</span>
+                <span style="font-weight:700;color:#1a9e6e;font-size:16px;" id="approve-amount"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:14px;">
+                <span style="color:#5a6478;">Transaction ID</span>
+                <span style="font-weight:700;color:#0a1628;font-family:monospace;" id="approve-txn"></span>
+            </div>
+        </div>
+        <div style="background:rgba(26,158,110,0.08);border:1px solid rgba(26,158,110,0.2);border-radius:10px;padding:12px 16px;font-size:13px;color:#1a9e6e;margin-bottom:20px;">
+            <i class="fa-solid fa-info-circle"></i>
+            Approve karne ke baad student ki payment <strong>Paid</strong> ho jayegi.
+        </div>
+        <form method="post" id="approveForm" action="">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="approve">
+            <div style="display:flex;gap:12px;">
+                <button type="submit" class="btn btn-success" style="flex:1;justify-content:center;padding:14px;">
+                    <i class="fa-solid fa-check"></i> Haan, Approve Karo
+                </button>
+                <button type="button" onclick="closeApprove()" class="btn btn-outline" style="flex:1;justify-content:center;padding:14px;">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openReject(pk, name, amount) {
+    document.getElementById('rejectModal').classList.add('open');
+    document.getElementById('rejectForm').action = `/admin-panel/fees/${pk}/verify/`;
+    document.getElementById('reject-info').innerHTML =
+        `<i class="fa-solid fa-user"></i> ${name} &nbsp;·&nbsp; ₹${amount} reject ho jayegi`;
+}
+function closeReject() {
+    document.getElementById('rejectModal').classList.remove('open');
+}
+document.getElementById('rejectModal').addEventListener('click', function(e) {
+    if (e.target === this) closeReject();
+});
+
+function copyTxn(btn, txn) {
+    var input = document.createElement('input');
+    input.setAttribute('value', txn);
+    input.setAttribute('type', 'text');
+    document.body.appendChild(input);
+    input.select();
+    input.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    document.body.removeChild(input);
+    btn.innerHTML = '✅ Copied!';
+    btn.style.background = '#1a9e6e';
+    btn.style.color = 'white';
+    btn.style.borderColor = '#1a9e6e';
+    setTimeout(function() {
+        btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
+        btn.style.background = 'none';
+        btn.style.color = '#c9a227';
+        btn.style.borderColor = '#c9a227';
+    }, 2000);
+}
+
+function openApprove(pk, name, amount, month, txn) {
+    document.getElementById('approveModal').classList.add('open');
+    document.getElementById('approveForm').action = `/admin-panel/fees/${pk}/verify/`;
+    document.getElementById('approve-student-name').textContent = name;
+    document.getElementById('approve-month').textContent = month;
+    document.getElementById('approve-amount').textContent = '₹' + amount;
+    document.getElementById('approve-txn').textContent = txn || 'N/A';
+}
+function closeApprove() {
+    document.getElementById('approveModal').classList.remove('open');
+}
+document.getElementById('approveModal').addEventListener('click', function(e) {
+    if (e.target === this) closeApprove();
+});
+
+function openSlip(url) {
+    window.open(url, '_blank');
+}
+</script>
+{% endblock %}

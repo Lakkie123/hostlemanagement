@@ -1,0 +1,468 @@
+{% extends 'hostel_app/student/base_student.html' %}
+{% block title %}Pay Fee — HostelHub{% endblock %}
+
+{% block extra_head %}
+<style>
+.pay-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+
+.amount-display {
+    background: linear-gradient(135deg, #0a1628 0%, #1e3a5f 100%);
+    border-radius: 20px; padding: 32px; color: white; text-align: center;
+    position: relative; overflow: hidden; margin-bottom: 24px;
+}
+.amount-display .label {
+    font-size: 12px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: #c9a227; margin-bottom: 8px;
+}
+.amount-display .amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px; font-weight: 800; color: white; line-height: 1;
+}
+.amount-display .room-info { font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 10px; }
+
+.qr-box {
+    position: relative; width: 200px; height: 200px;
+    border-radius: 16px; overflow: hidden;
+    box-shadow: 0 8px 32px rgba(10,22,40,0.15);
+    border: 4px solid white; outline: 3px solid #c9a227;
+    margin: 0 auto;
+}
+.qr-scan-line {
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, #c9a227, transparent);
+    animation: scanLine 2s ease-in-out infinite;
+}
+@keyframes scanLine {
+    0% { top: 0; opacity: 1; } 100% { top: 100%; opacity: 0.3; }
+}
+
+.upi-apps { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.upi-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border-radius: 12px;
+    border: 2px solid #e8ecf4; background: white;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.28s; font-size: 14px; font-weight: 600; color: #0a1628;
+}
+.upi-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(10,22,40,0.18); }
+.upi-btn.gpay { border-color: #4285f4; }
+.upi-btn.gpay:hover { background: #f0f6ff; }
+.upi-btn.phonepe { border-color: #5f259f; }
+.upi-btn.phonepe:hover { background: #f8f0ff; }
+.upi-btn.paytm { border-color: #00b9f1; }
+.upi-btn.paytm:hover { background: #f0fbff; }
+.upi-btn.bhim { border-color: #00a650; }
+.upi-btn.bhim:hover { background: #f0fff6; }
+
+.upi-logo {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 900; color: white; flex-shrink: 0;
+}
+
+.upi-id-box {
+    background: #f4f6fa; border: 1.5px dashed #9ba4b8;
+    border-radius: 10px; padding: 10px 16px; font-size: 14px;
+    color: #0a1628; font-weight: 600; cursor: pointer;
+    transition: all 0.28s; display: flex; align-items: center;
+    gap: 10px; margin-top: 12px;
+}
+.upi-id-box:hover { border-color: #c9a227; background: rgba(201,162,39,0.06); }
+
+.steps-row {
+    display: flex; align-items: center;
+    padding: 20px 28px; gap: 0;
+}
+.step-dot { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; text-align: center; }
+.step-dot .num {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #0a1628; color: white; font-size: 13px;
+    font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+.step-dot .txt { font-size: 11px; color: #5a6478; font-weight: 500; }
+.step-line { height: 2px; flex: 1; background: #e8ecf4; margin-bottom: 22px; }
+
+.txn-wrap { position: relative; }
+.txn-wrap input { padding-left: 42px; }
+.txn-wrap .ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ba4b8; font-size: 14px; }
+
+@media (max-width: 768px) { .pay-layout { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block student_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">Pay Hostel Fee</div>
+        <div class="page-subtitle">GPay, PhonePe, Paytm ya QR se instantly pay karo</div>
+    </div>
+    <a href="{% url 'my_payments' %}" class="btn btn-outline btn-sm">
+        <i class="fa-solid fa-clock-rotate-left"></i> Payment History
+    </a>
+</div>
+
+{% if not allocation %}
+<div class="alert alert-warning">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    Koi active room allocation nahi mila. Admin se contact karo.
+</div>
+{% else %}
+
+<!-- Steps -->
+<div class="card mb-24 fade-in fade-in-delay-1">
+    <div class="steps-row">
+        <div class="step-dot"><div class="num">1</div><div class="txt">Month Chuno</div></div>
+        <div class="step-line"></div>
+        <div class="step-dot"><div class="num">2</div><div class="txt">QR Scan / App Open</div></div>
+        <div class="step-line"></div>
+        <div class="step-dot"><div class="num">3</div><div class="txt">₹{{ allocation.monthly_rent }} Pay Karo</div></div>
+        <div class="step-line"></div>
+        <div class="step-dot"><div class="num">4</div><div class="txt">Txn ID Daalo</div></div>
+        <div class="step-line"></div>
+        <div class="step-dot"><div class="num" style="background:var(--success);">✓</div><div class="txt">Done!</div></div>
+    </div>
+</div>
+
+<div class="pay-layout fade-in fade-in-delay-2">
+
+    <!-- LEFT: QR + UPI Buttons -->
+    <div>
+        <!-- Amount Box -->
+        <div class="amount-display">
+            <div class="label">Monthly Fee</div>
+            <div class="amount">₹{{ allocation.monthly_rent }}</div>
+            <div class="room-info">Room {{ allocation.room.room_number }} · {{ profile.user.get_full_name }}</div>
+        </div>
+
+        <!-- QR Card -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-qrcode" style="color:var(--gold);margin-right:8px;"></i>QR Code se Pay Karo</div>
+                <span class="badge badge-success" style="font-size:11px;"><i class="fa-solid fa-circle" style="font-size:7px;"></i> UPI Live</span>
+            </div>
+            <div class="card-body" style="text-align:center;padding:24px;">
+
+                <!-- QR Image (api.qrserver.com se real QR) -->
+                <div class="qr-box">
+                    <div class="qr-scan-line"></div>
+                    <img id="qr-img"
+                        src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3Dhostelhub%40okaxis%26pn%3DHostelHub%26am%3D{{ allocation.monthly_rent }}%26cu%3DINR%26tn%3DHostelFee-{{ allocation.room.room_number }}-{{ profile.roll_number }}"
+                        alt="UPI QR" width="200" height="200" style="display:block;"
+                        onerror="this.style.display='none';document.getElementById('qr-err').style.display='flex';">
+                    <div id="qr-err" style="display:none;width:200px;height:200px;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:#f4f6fa;">
+                        <i class="fa-solid fa-qrcode" style="font-size:60px;color:var(--navy);"></i>
+                        <div style="font-size:11px;color:#5a6478;padding:0 10px;">Neeche UPI ID use karo</div>
+                    </div>
+                </div>
+
+                <div style="font-size:13px;font-weight:600;color:var(--navy);margin-top:14px;">Kisi bhi UPI app se scan karo</div>
+
+                <!-- UPI ID Copy -->
+                <div class="upi-id-box" onclick="copyUPI()" title="Click to copy">
+                    <i class="fa-solid fa-at" style="color:var(--gold);"></i>
+                    <span id="upi-text">hostelhub@okaxis</span>
+                    <i class="fa-regular fa-copy" id="copy-icon" style="margin-left:auto;color:#9ba4b8;"></i>
+                </div>
+                <div style="font-size:11px;color:#9ba4b8;margin-top:6px;">👆 Click karke UPI ID copy karo</div>
+
+                <!-- UPI App Buttons -->
+                <div style="margin-top:20px;border-top:1px solid #e8ecf4;padding-top:18px;">
+                    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a6478;margin-bottom:14px;">Ya seedha app mein open karo</div>
+                    <div class="upi-apps">
+
+                        <a href="tez://upi/pay?pa=hostelhub@okaxis&pn=HostelHub&am={{ allocation.monthly_rent }}&cu=INR&tn=HostelFee-{{ allocation.room.room_number }}" class="upi-btn gpay">
+                            <div class="upi-logo" style="background:white;border:1.5px solid #ddd;">
+                                <svg width="22" height="22" viewBox="0 0 48 48"><text y="30" font-size="26" font-family="Arial" font-weight="bold" fill="#4285f4">G</text></svg>
+                            </div>
+                            Google Pay
+                        </a>
+
+                        <a href="phonepe://pay?pa=hostelhub@okaxis&pn=HostelHub&am={{ allocation.monthly_rent }}&cu=INR&tn=HostelFee-{{ allocation.room.room_number }}" class="upi-btn phonepe">
+                            <div class="upi-logo" style="background:#5f259f;">
+                                <i class="fa-solid fa-bolt" style="font-size:13px;"></i>
+                            </div>
+                            PhonePe
+                        </a>
+
+                        <a href="paytmmp://pay?pa=hostelhub@okaxis&pn=HostelHub&am={{ allocation.monthly_rent }}&cu=INR&tn=HostelFee-{{ allocation.room.room_number }}" class="upi-btn paytm">
+                            <div class="upi-logo" style="background:#00b9f1;">
+                                <span style="font-size:8px;">PAY</span>
+                            </div>
+                            Paytm
+                        </a>
+
+                        <a href="upi://pay?pa=hostelhub@okaxis&pn=HostelHub&am={{ allocation.monthly_rent }}&cu=INR&tn=HostelFee-{{ allocation.room.room_number }}" class="upi-btn bhim">
+                            <div class="upi-logo" style="background:#00a650;">
+                                <span style="font-size:8px;">UPI</span>
+                            </div>
+                            BHIM UPI
+                        </a>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: Confirm Form -->
+    <div>
+
+        <!-- Pending dues agar hain -->
+        {% if pending_payments %}
+        <div class="card mb-20">
+            <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-triangle-exclamation" style="color:var(--warning);margin-right:8px;"></i>Pending Dues</div>
+            </div>
+            <div class="card-body">
+                {% for p in pending_payments %}
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--gray-200);">
+                    <span style="font-size:14px;font-weight:600;">{{ p.month }}</span>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span style="font-weight:700;color:var(--danger);">₹{{ p.amount }}</span>
+                        <span class="badge badge-warning">{{ p.get_status_display }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Confirm Form -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-circle-check" style="color:var(--success);margin-right:8px;"></i>Payment Confirm Karo</div>
+                <span class="badge badge-warning">Pay karne ke baad</span>
+            </div>
+            <div class="card-body">
+
+                <div class="alert alert-info mb-16">
+                    <i class="fa-solid fa-circle-info"></i>
+                    UPI app mein pay karne ke baad <strong>Transaction ID</strong> yahan daalo. Admin 24 ghante mein verify karega.
+                </div>
+
+              <form method="post" action="{% url 'confirm_payment' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="allocation_id" value="{{ allocation.pk }}">
+
+                    <div class="form-group">
+                        <label class="form-label">Konse Mahine ki Fee? *</label>
+                        <select name="month" class="form-control" required>
+                            <option value="">-- Month Chuno --</option>
+                            {% for m in months %}
+                            <option value="{{ m }}">{{ m }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Amount (₹) *</label>
+                        <div class="txn-wrap">
+                            <i class="ico fa-solid fa-indian-rupee-sign"></i>
+                            <input type="number" name="amount" class="form-control"
+                                   value="{{ allocation.monthly_rent }}" min="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">UPI Transaction ID *</label>
+                        <div class="txn-wrap">
+                            <i class="ico fa-solid fa-hashtag"></i>
+                            <input type="text" name="transaction_id" class="form-control"
+                                   placeholder="e.g. 406812345678" required>
+                        </div>
+                        <div style="font-size:12px;color:var(--gray-400);margin-top:5px;">
+                            <i class="fa-solid fa-info-circle"></i> UPI app ke transaction history mein milega
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+    <label class="form-label">Bank Slip Photo Upload Karo *</label>
+    <div id="slip-upload-box"
+         onclick="document.getElementById('slip-input').click()"
+         ondragover="event.preventDefault();this.style.borderColor='#c9a227';"
+         ondragleave="this.style.borderColor='#e8ecf4';"
+         ondrop="handleDrop(event)"
+         style="border:2px dashed #e8ecf4; border-radius:12px; padding:32px 20px;
+                text-align:center; cursor:pointer; transition:all 0.28s;
+                background:#faf8f2;">
+        <i class="fa-solid fa-cloud-arrow-up" style="font-size:36px; color:#c9a227; margin-bottom:12px; display:block;"></i>
+        <div style="font-size:15px; font-weight:600; color:#0a1628; margin-bottom:6px;">
+            Slip ki Photo Yahan Upload Karo
+        </div>
+        <div style="font-size:13px; color:#9ba4b8;">
+            Click karo ya drag & drop karo · JPG, PNG, PDF
+        </div>
+       <input type="file" id="slip-input" name="slip_image"
+       accept="image/*,.pdf" style="display:none;"
+       required
+       onchange="previewSlip(this)">
+    </div>
+
+    <!-- Preview -->
+    <div id="slip-preview" style="display:none; margin-top:12px; position:relative;">
+        <img id="preview-img" src="" alt="Slip Preview"
+             style="width:100%; max-height:280px; object-fit:contain;
+                    border-radius:10px; border:2px solid #c9a227;">
+        <button type="button" onclick="removeSlip()"
+                style="position:absolute; top:8px; right:8px;
+                       background:#d94f4f; color:white; border:none;
+                       border-radius:50%; width:28px; height:28px;
+                       cursor:pointer; font-size:14px; font-weight:700;">
+            ✕
+        </button>
+        <div id="preview-name" style="font-size:12px; color:#5a6478; margin-top:6px; text-align:center;"></div>
+    </div>
+</div>
+
+                    <div class="form-group">
+                        <label class="form-label">Payment App</label>
+                        <select name="payment_method" class="form-control">
+                            <option value="upi">Google Pay</option>
+                            <option value="upi">PhonePe</option>
+                            <option value="upi">Paytm</option>
+                            <option value="upi">BHIM UPI</option>
+                            <option value="online">Net Banking</option>
+                            <option value="cash">Cash (Warden ko diya)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Note (Optional)</label>
+                        <textarea name="notes" class="form-control" rows="2" placeholder="Koi remark..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-gold btn-lg" style="width:100%;justify-content:center;"
+        onclick="return checkSlip()">
+                        <i class="fa-solid fa-paper-plane"></i> Submit Confirmation
+                    </button>
+                    <p style="font-size:12px;color:var(--gray-400);text-align:center;margin-top:10px;">
+                        Admin verify karke paid mark karega ✓
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Recent Payments -->
+        <div class="card mt-24">
+            <div class="card-header">
+                <div class="card-title">Recent Payments</div>
+                <a href="{% url 'my_payments' %}" class="btn btn-outline btn-sm">Sab dekho</a>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Month</th><th>Amount</th><th>Txn ID</th><th>Status</th></tr></thead>
+                    <tbody>
+                        {% for p in recent_payments %}
+                        <tr>
+                            <td style="font-weight:600;font-size:13px;">{{ p.month }}</td>
+                            <td style="color:var(--success);font-weight:700;">₹{{ p.amount }}</td>
+                            <td style="font-size:12px;color:var(--gray-400);">{{ p.transaction_id|default:"—" }}</td>
+                            <td>
+                                <span class="badge {% if p.status == 'paid' %}badge-success{% elif p.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
+                                    {{ p.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--gray-400);">Koi payment nahi abhi tak</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyUPI() {
+    const text = document.getElementById('upi-text').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        const icon = document.getElementById('copy-icon');
+        icon.className = 'fa-solid fa-check';
+        icon.style.color = 'var(--success)';
+        setTimeout(() => {
+            icon.className = 'fa-regular fa-copy';
+            icon.style.color = '#9ba4b8';
+        }, 2000);
+    });
+}
+
+// Amount change hone par QR update hoga
+document.querySelector('input[name="amount"]')?.addEventListener('input', function() {
+    const amt = this.value;
+    if (amt > 0) {
+        const data = encodeURIComponent(`upi://pay?pa=hostelhub@okaxis&pn=HostelHub&am=${amt}&cu=INR`);
+        document.getElementById('qr-img').src =
+            `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${data}`;
+    }
+});
+
+function previewSlip(input) {
+    const file = input.files[0];
+    if (!file) return;
+    document.getElementById('preview-name').textContent = file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)';
+    if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('preview-img').src = e.target.result;
+            document.getElementById('slip-preview').style.display = 'block';
+            document.getElementById('slip-upload-box').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        // PDF
+        document.getElementById('preview-img').src = '';
+        document.getElementById('preview-img').style.display = 'none';
+        document.getElementById('slip-preview').style.display = 'block';
+        document.getElementById('slip-upload-box').style.display = 'none';
+        document.getElementById('preview-name').innerHTML =
+            '<i class="fa-solid fa-file-pdf" style="color:#d94f4f;font-size:40px;"></i><br>' + file.name;
+    }
+}
+
+function removeSlip() {
+    document.getElementById('slip-input').value = '';
+    document.getElementById('slip-preview').style.display = 'none';
+    document.getElementById('slip-upload-box').style.display = 'block';
+    document.getElementById('preview-img').style.display = 'block';
+}
+
+function handleDrop(event) {
+    event.preventDefault();
+    document.getElementById('slip-input').files = event.dataTransfer.files;
+    previewSlip(document.getElementById('slip-input'));
+    document.getElementById('slip-upload-box').style.borderColor = '#e8ecf4';
+}
+
+function checkSlip() {
+    const input = document.getElementById('slip-input');
+    if (!input || !input.files || input.files.length === 0) {
+        // Upload box ko red border de do
+        const box = document.getElementById('slip-upload-box');
+        if (box) {
+            box.style.borderColor = '#d94f4f';
+            box.style.background = 'rgba(217,79,79,0.04)';
+            box.innerHTML = `
+                <i class="fa-solid fa-triangle-exclamation" style="font-size:36px;color:#d94f4f;margin-bottom:12px;display:block;"></i>
+                <div style="font-size:15px;font-weight:700;color:#d94f4f;margin-bottom:6px;">Bank Slip Upload Karna Zaroori Hai!</div>
+                <div style="font-size:13px;color:#9ba4b8;">Bina slip ke payment submit nahi hogi</div>
+                <input type="file" id="slip-input" name="slip_image"
+                       accept="image/*,.pdf" style="display:none;"
+                       required onchange="previewSlip(this)">
+            `;
+            // Scroll karke dikhao
+            box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return false; // Form submit mat hone do
+    }
+    return true; // Sab theek hai — submit karo
+}
+</script>
+{% endblock %}

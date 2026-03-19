@@ -1,0 +1,92 @@
+{% extends 'hostel_app/admin/base_admin.html' %}
+{% block title %}Fee Management — HostelHub{% endblock %}
+{% block admin_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">Fee Management</div>
+        <div class="page-subtitle">Track and manage all fee payments</div>
+    </div>
+    <a href="{% url 'add_fee' %}" class="btn btn-gold"><i class="fa-solid fa-plus"></i> Record Payment</a>
+</div>
+
+<!-- Summary Cards -->
+<div class="stats-grid fade-in fade-in-delay-1" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px;">
+    <div class="stat-card">
+        <div class="stat-icon success"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">₹{{ total_collected|floatformat:0 }}</div>
+            <div class="stat-label">Total Collected</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon warning"><i class="fa-solid fa-clock"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">₹{{ total_pending|floatformat:0 }}</div>
+            <div class="stat-label">Pending Amount</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon navy"><i class="fa-solid fa-receipt"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ payments|length }}</div>
+            <div class="stat-label">Total Records</div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-20 fade-in fade-in-delay-2">
+    <div class="card-body" style="padding:16px 24px;">
+        <form method="get" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+            <select name="status" class="form-control" style="width:auto;">
+                <option value="">All Status</option>
+                <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Paid</option>
+                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="overdue" {% if status_filter == 'overdue' %}selected{% endif %}>Overdue</option>
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-filter"></i> Filter</button>
+            <a href="{% url 'manage_fees' %}" class="btn btn-outline btn-sm">Clear</a>
+        </form>
+    </div>
+</div>
+
+<div class="card fade-in fade-in-delay-3">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr><th>Student</th><th>Month</th><th>Amount</th><th>Due Date</th><th>Payment Date</th><th>Method</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td>
+                        <div style="font-weight:600;font-size:14px;">{{ p.allocation.student.user.get_full_name }}</div>
+                        <div style="font-size:12px;color:var(--gray-400);">Room {{ p.allocation.room.room_number }}</div>
+                    </td>
+                    <td style="font-weight:500;">{{ p.month }}</td>
+                    <td style="font-weight:700;color:var(--success);font-size:15px;">₹{{ p.amount }}</td>
+                    <td style="font-size:13px;">{{ p.due_date|date:"d M Y" }}</td>
+                    <td style="font-size:13px;">{{ p.payment_date|date:"d M Y" }}</td>
+                    <td><span class="badge badge-info">{{ p.get_payment_method_display }}</span></td>
+                    <td>
+                        <span class="badge {% if p.status == 'paid' %}badge-success{% elif p.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
+                            {{ p.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7">
+                    <div class="empty-state">
+                        <i class="fa-solid fa-indian-rupee-sign"></i>
+                        <h3>No Fee Records</h3>
+                        <p>Record fee payments to track revenue.</p>
+                        <a href="{% url 'add_fee' %}" class="btn btn-gold mt-16"><i class="fa-solid fa-plus"></i> Record Payment</a>
+                    </div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'hostel_app/admin/base_admin.html' %}
+{% block title %}Room Allocations — HostelHub{% endblock %}
+{% block admin_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">Room Allocations</div>
+        <div class="page-subtitle">Manage all student room assignments</div>
+    </div>
+    <a href="{% url 'add_allocation' %}" class="btn btn-gold"><i class="fa-solid fa-plus"></i> New Allocation</a>
+</div>
+
+<div class="card mb-20 fade-in fade-in-delay-1">
+    <div class="card-body" style="padding:16px 24px;">
+        <form method="get" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+            <select name="status" class="form-control" style="width:auto;">
+                <option value="">All Status</option>
+                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                <option value="vacated" {% if status_filter == 'vacated' %}selected{% endif %}>Vacated</option>
+                <option value="transferred" {% if status_filter == 'transferred' %}selected{% endif %}>Transferred</option>
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-filter"></i> Filter</button>
+            <a href="{% url 'manage_allocations' %}" class="btn btn-outline btn-sm">Clear</a>
+        </form>
+    </div>
+</div>
+
+<div class="card fade-in fade-in-delay-2">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr><th>Student</th><th>Room</th><th>Allocated Date</th><th>Expected Vacate</th><th>Rent</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for alloc in allocations %}
+                <tr>
+                    <td>
+                        <div style="font-weight:600;font-size:14px;">{{ alloc.student.user.get_full_name }}</div>
+                        <div style="font-size:12px;color:var(--gray-400);">{{ alloc.student.roll_number }}</div>
+                    </td>
+                    <td>
+                        <span class="badge badge-navy">{{ alloc.room.room_number }}</span>
+                        <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">{{ alloc.room.room_type.name }}</div>
+                    </td>
+                    <td style="font-size:13px;">{{ alloc.allocated_date|date:"d M Y" }}</td>
+                    <td style="font-size:13px;">{{ alloc.expected_vacate_date|date:"d M Y"|default:"—" }}</td>
+                    <td style="font-weight:600;color:var(--success);">₹{{ alloc.monthly_rent }}</td>
+                    <td>
+                        <span class="badge {% if alloc.status == 'active' %}badge-success{% elif alloc.status == 'vacated' %}badge-gray{% else %}badge-warning{% endif %}">
+                            {{ alloc.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if alloc.status == 'active' %}
+                        <a href="{% url 'vacate_allocation' alloc.pk %}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Are you sure you want to vacate this allocation?')">
+                            <i class="fa-solid fa-door-open"></i> Vacate
+                        </a>
+                        {% else %}
+                        <span style="font-size:13px;color:var(--gray-400);">Closed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7">
+                    <div class="empty-state">
+                        <i class="fa-solid fa-key"></i>
+                        <h3>No Allocations Found</h3>
+                        <p>Create a new allocation to assign rooms to students.</p>
+                        <a href="{% url 'add_allocation' %}" class="btn btn-gold mt-16"><i class="fa-solid fa-plus"></i> New Allocation</a>
+                    </div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

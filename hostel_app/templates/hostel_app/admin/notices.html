@@ -1,0 +1,46 @@
+{% extends 'hostel_app/admin/base_admin.html' %}
+{% block title %}Notices — HostelHub{% endblock %}
+{% block admin_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">Notice Board</div>
+        <div class="page-subtitle">Post and manage hostel notices</div>
+    </div>
+    <a href="{% url 'add_notice' %}" class="btn btn-gold"><i class="fa-solid fa-bullhorn"></i> Post Notice</a>
+</div>
+
+<div style="display:grid;gap:16px;" class="fade-in fade-in-delay-1">
+    {% for notice in notices %}
+    <div class="notice-card {{ notice.category }}" style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;">
+        <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                <div class="notice-title">{{ notice.title }}</div>
+                <span class="badge {% if notice.category == 'urgent' %}badge-danger{% elif notice.category == 'event' %}badge-success{% elif notice.category == 'fee' %}badge-warning{% else %}badge-navy{% endif %}">
+                    {{ notice.get_category_display }}
+                </span>
+                {% if not notice.is_active %}
+                <span class="badge badge-gray">Inactive</span>
+                {% endif %}
+            </div>
+            <div class="notice-date">
+                <i class="fa-regular fa-calendar"></i> {{ notice.created_at|date:"d M Y, H:i" }}
+                {% if notice.expires_at %} · Expires: {{ notice.expires_at|date:"d M Y" }}{% endif %}
+            </div>
+            <div class="notice-content">{{ notice.content }}</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+            <a href="{% url 'edit_notice' notice.pk %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-pen"></i></a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+        <i class="fa-solid fa-bullhorn"></i>
+        <h3>No Notices Yet</h3>
+        <p>Post a notice to inform students about important updates.</p>
+        <a href="{% url 'add_notice' %}" class="btn btn-gold mt-16"><i class="fa-solid fa-plus"></i> Post First Notice</a>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

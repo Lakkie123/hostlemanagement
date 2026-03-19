@@ -1,0 +1,200 @@
+{% extends 'hostel_app/base.html' %}
+{% block title %}Login — HostelHub{% endblock %}
+{% block body %}
+
+<style>
+.auth-layout {
+    min-height: calc(100vh - 68px - 60px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.auth-left {
+    background: linear-gradient(145deg, var(--navy) 0%, #1e3a5f 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-left::before {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -100px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(201,162,39,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.auth-left-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(201,162,39,0.15);
+    border: 1px solid rgba(201,162,39,0.3);
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 99px;
+    margin-bottom: 28px;
+}
+
+.auth-left h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    font-weight: 800;
+}
+.auth-left h2 span { color: var(--gold); }
+
+.auth-left p {
+    color: rgba(255,255,255,0.6);
+    font-size: 16px;
+    line-height: 1.7;
+    max-width: 360px;
+}
+
+.auth-features {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.auth-feature {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: rgba(255,255,255,0.8);
+    font-size: 14px;
+}
+
+.auth-feature-icon {
+    width: 36px; height: 36px;
+    background: rgba(201,162,39,0.15);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold);
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.auth-right {
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 80px;
+}
+
+.auth-form-card {
+    width: 100%;
+    max-width: 420px;
+}
+
+.auth-form-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    color: var(--navy);
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.auth-form-sub {
+    color: var(--gray-600);
+    font-size: 14px;
+    margin-bottom: 36px;
+}
+
+.admin-hint {
+    background: rgba(201,162,39,0.08);
+    border: 1px solid rgba(201,162,39,0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--gray-600);
+    margin-bottom: 28px;
+}
+.admin-hint strong { color: var(--navy); }
+</style>
+
+<div class="auth-layout">
+    <div class="auth-left">
+        <div class="auth-left-tag"><i class="fa-solid fa-shield-halved"></i> Secure Portal</div>
+        <h2>Welcome<br>Back to <span>HostelHub</span></h2>
+        <p>Your trusted hostel management platform. Sign in to access your dashboard.</p>
+        <div class="auth-features">
+            <div class="auth-feature">
+                <div class="auth-feature-icon"><i class="fa-solid fa-bed"></i></div>
+                Room allocation and management
+            </div>
+            <div class="auth-feature">
+                <div class="auth-feature-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                Fee payment tracking
+            </div>
+            <div class="auth-feature">
+                <div class="auth-feature-icon"><i class="fa-solid fa-bell"></i></div>
+                Notices and announcements
+            </div>
+            <div class="auth-feature">
+                <div class="auth-feature-icon"><i class="fa-solid fa-headset"></i></div>
+                24/7 complaint management
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-right">
+        <div class="auth-form-card fade-in">
+            <div class="auth-form-title">Sign In</div>
+            <div class="auth-form-sub">Enter your credentials to continue</div>
+
+            <div class="admin-hint">
+                <strong>FILL THE CORRECT CREDENTIALS TO LOG IN</strong> 
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                {% if form.errors %}
+                <div class="alert alert-danger"><i class="fa-solid fa-exclamation-circle"></i> Invalid username or password.</div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <div style="position:relative;">
+                        <i class="fa-solid fa-user" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:14px;"></i>
+                        <input type="text" name="username" class="form-control" placeholder="Enter username" style="padding-left:42px;" autofocus>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div style="position:relative;">
+                        <i class="fa-solid fa-lock" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:14px;"></i>
+                        <input type="password" name="password" class="form-control" placeholder="Enter password" style="padding-left:42px;">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;margin-top:8px;">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+                </button>
+            </form>
+
+            <div class="divider"></div>
+
+            <p style="text-align:center;font-size:14px;color:var(--gray-600);">
+                Don't have an account?
+                <a href="{% url 'register' %}" style="color:var(--gold);font-weight:600;text-decoration:none;">Register here</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

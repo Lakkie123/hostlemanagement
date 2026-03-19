@@ -1,0 +1,113 @@
+{% extends 'hostel_app/admin/base_admin.html' %}
+{% block title %}Room {{ room.room_number }} — HostelHub{% endblock %}
+{% block admin_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">Room {{ room.room_number }}</div>
+        <div class="page-subtitle">{{ room.room_type.name }} · Floor {{ room.floor }}</div>
+    </div>
+    <div style="display:flex;gap:10px;">
+        <a href="{% url 'edit_room' room.pk %}" class="btn btn-gold btn-sm"><i class="fa-solid fa-pen"></i> Edit Room</a>
+        <a href="{% url 'manage_rooms' %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Back</a>
+    </div>
+</div>
+
+<div class="grid-2 mb-24 fade-in fade-in-delay-1">
+    <div class="card">
+        <div class="card-header"><div class="card-title">Room Details</div></div>
+        <div class="card-body">
+            <div style="display:grid;gap:14px;">
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="color:var(--gray-600);font-size:14px;">Status</span>
+                    <span class="badge {% if room.status == 'available' %}badge-success{% elif room.status == 'occupied' %}badge-info{% elif room.status == 'maintenance' %}badge-warning{% else %}badge-gold{% endif %}">
+                        {{ room.get_status_display }}
+                    </span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="color:var(--gray-600);font-size:14px;">Type</span>
+                    <span style="font-weight:600;">{{ room.room_type.name }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="color:var(--gray-600);font-size:14px;">Capacity</span>
+                    <span style="font-weight:600;">{{ room.room_type.capacity }} persons</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="color:var(--gray-600);font-size:14px;">Current Occupancy</span>
+                    <span style="font-weight:600;">{{ room.current_occupancy }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="color:var(--gray-600);font-size:14px;">Monthly Rent</span>
+                    <span style="font-weight:600;color:var(--success);">₹{{ room.room_type.price_per_month }}</span>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="room-amenities" style="gap:10px;">
+                {% if room.has_ac %}<span class="amenity-tag" style="background:rgba(34,114,195,0.1);color:var(--info);"><i class="fa-solid fa-snowflake"></i> Air Conditioning</span>{% endif %}
+                {% if room.has_wifi %}<span class="amenity-tag" style="background:rgba(26,158,110,0.1);color:var(--success);"><i class="fa-solid fa-wifi"></i> WiFi</span>{% endif %}
+                {% if room.has_attached_bathroom %}<span class="amenity-tag" style="background:rgba(10,22,40,0.08);color:var(--navy);"><i class="fa-solid fa-shower"></i> Attached Bathroom</span>{% endif %}
+                {% if room.has_tv %}<span class="amenity-tag" style="background:rgba(224,124,31,0.1);color:var(--warning);"><i class="fa-solid fa-tv"></i> Television</span>{% endif %}
+            </div>
+            {% if room.notes %}
+            <div class="divider"></div>
+            <div style="font-size:13px;color:var(--gray-600);">{{ room.notes }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><div class="card-title">Occupancy</div></div>
+        <div class="card-body">
+            <div style="text-align:center;padding:20px 0;">
+                <div style="font-size:52px;font-weight:700;font-family:'Playfair Display',serif;color:var(--navy);">
+                    {{ room.occupancy_percent }}%
+                </div>
+                <div style="color:var(--gray-600);font-size:14px;margin-top:4px;">Occupied</div>
+            </div>
+            <div class="progress-bar" style="height:12px;margin-bottom:16px;">
+                <div class="progress-fill {% if room.occupancy_percent == 100 %}{% elif room.occupancy_percent >= 50 %}{% endif %}"
+                     style="width:{{ room.occupancy_percent }}%;background:{% if room.occupancy_percent == 100 %}var(--danger){% elif room.occupancy_percent >= 50 %}var(--warning){% else %}var(--success){% endif %};"></div>
+            </div>
+            <div style="text-align:center;font-size:14px;color:var(--gray-600);">
+                {{ room.current_occupancy }} of {{ room.room_type.capacity }} seats filled
+            </div>
+            {% if room.is_available %}
+            <div style="text-align:center;margin-top:20px;">
+                <a href="{% url 'add_allocation' %}?room={{ room.pk }}" class="btn btn-gold"><i class="fa-solid fa-key"></i> Allocate Room</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card fade-in fade-in-delay-2">
+    <div class="card-header">
+        <div class="card-title">Allocation History</div>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr><th>Student</th><th>Allocated Date</th><th>Expected Vacate</th><th>Actual Vacate</th><th>Rent</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for alloc in allocations %}
+                <tr>
+                    <td>
+                        <div style="font-weight:600;">{{ alloc.student.user.get_full_name }}</div>
+                        <div style="font-size:12px;color:var(--gray-400);">{{ alloc.student.roll_number }}</div>
+                    </td>
+                    <td>{{ alloc.allocated_date|date:"d M Y" }}</td>
+                    <td>{{ alloc.expected_vacate_date|date:"d M Y"|default:"—" }}</td>
+                    <td>{{ alloc.actual_vacate_date|date:"d M Y"|default:"—" }}</td>
+                    <td style="color:var(--success);font-weight:600;">₹{{ alloc.monthly_rent }}</td>
+                    <td><span class="badge {% if alloc.status == 'active' %}badge-success{% elif alloc.status == 'vacated' %}badge-gray{% else %}badge-warning{% endif %}">{{ alloc.get_status_display }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center" style="padding:30px;color:var(--gray-400);">No allocation history</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

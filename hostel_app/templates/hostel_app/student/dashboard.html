@@ -1,0 +1,192 @@
+{% extends 'hostel_app/student/base_student.html' %}
+{% block title %}My Dashboard — HostelHub{% endblock %}
+{% block student_content %}
+
+<div class="page-header fade-in">
+    <div>
+        <div class="page-title">Welcome, {{ profile.user.first_name }}!</div>
+        <div class="page-subtitle">Here's your hostel overview for today.</div>
+    </div>
+    {% if profile.status == 'pending' %}
+    <span class="badge badge-warning" style="padding:8px 14px;font-size:13px;">
+        <i class="fa-solid fa-clock"></i> Account Pending Approval
+    </span>
+    {% endif %}
+</div>
+
+{% if profile.status == 'pending' %}
+<div class="alert alert-warning fade-in">
+    <i class="fa-solid fa-hourglass-half"></i>
+    Your account is pending admin approval. Room allocation will be available once approved.
+</div>
+{% endif %}
+
+<!-- Stats -->
+<div class="stats-grid fade-in fade-in-delay-1">
+    <div class="stat-card">
+        <div class="stat-icon {% if allocation %}success{% else %}warning{% endif %}">
+            <i class="fa-solid fa-bed"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{% if allocation %}{{ allocation.room.room_number }}{% else %}—{% endif %}</div>
+            <div class="stat-label">My Room</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon gold">
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{% if allocation %}₹{{ allocation.monthly_rent }}{% else %}—{% endif %}</div>
+            <div class="stat-label">Monthly Rent</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon {% if pending_fees > 0 %}danger{% else %}success{% endif %}">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ pending_fees }}</div>
+            <div class="stat-label">Pending Fees</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon navy">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ complaints|length }}</div>
+            <div class="stat-label">My Complaints</div>
+        </div>
+    </div>
+</div>
+
+<!-- Room Card + Notices -->
+<div class="grid-2 mb-24 fade-in fade-in-delay-2">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-bed" style="color:var(--gold);margin-right:8px;"></i>My Room</div>
+            <a href="{% url 'my_room' %}" class="btn btn-outline btn-sm">Details</a>
+        </div>
+        <div class="card-body">
+            {% if allocation %}
+            <div style="text-align:center;padding:20px 0;">
+                <div style="font-family:'Playfair Display',serif;font-size:48px;font-weight:700;color:var(--navy);">{{ allocation.room.room_number }}</div>
+                <div style="color:var(--gray-600);font-size:14px;margin-top:4px;">{{ allocation.room.room_type.name }} · Floor {{ allocation.room.floor }}</div>
+                <div style="margin-top:16px;display:flex;justify-content:center;gap:8px;">
+                    {% if allocation.room.has_ac %}<span class="amenity-tag"><i class="fa-solid fa-snowflake"></i> AC</span>{% endif %}
+                    {% if allocation.room.has_wifi %}<span class="amenity-tag"><i class="fa-solid fa-wifi"></i> WiFi</span>{% endif %}
+                    {% if allocation.room.has_attached_bathroom %}<span class="amenity-tag"><i class="fa-solid fa-shower"></i> Bath</span>{% endif %}
+                    {% if allocation.room.has_tv %}<span class="amenity-tag"><i class="fa-solid fa-tv"></i> TV</span>{% endif %}
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div style="display:grid;gap:10px;">
+                <div style="display:flex;justify-content:space-between;font-size:13px;">
+                    <span style="color:var(--gray-600);">Allocated Since</span>
+                    <span style="font-weight:600;">{{ allocation.allocated_date|date:"d M Y" }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;">
+                    <span style="color:var(--gray-600);">Monthly Rent</span>
+                    <span style="font-weight:700;color:var(--success);">₹{{ allocation.monthly_rent }}</span>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state" style="padding:40px 20px;">
+                <i class="fa-solid fa-bed"></i>
+                <h3>No Room Allocated</h3>
+                <p>Contact the admin to get a room allocated.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-bullhorn" style="color:var(--gold);margin-right:8px;"></i>Latest Notices</div>
+        </div>
+        <div class="card-body" style="padding:0;">
+            {% for notice in notices %}
+            <div style="padding:14px 20px;border-bottom:1px solid var(--gray-200);">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
+                    <div style="font-weight:600;font-size:14px;color:var(--navy);">{{ notice.title }}</div>
+                    <span class="badge {% if notice.category == 'urgent' %}badge-danger{% elif notice.category == 'fee' %}badge-warning{% else %}badge-navy{% endif %}" style="font-size:10px;">
+                        {{ notice.get_category_display }}
+                    </span>
+                </div>
+                <div style="font-size:13px;color:var(--gray-600);">{{ notice.content|truncatewords:20 }}</div>
+                <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">{{ notice.created_at|date:"d M Y" }}</div>
+            </div>
+            {% empty %}
+            <div class="empty-state" style="padding:40px;">
+                <i class="fa-solid fa-bell-slash" style="font-size:32px;"></i>
+                <p style="margin-top:10px;">No notices at the moment</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Recent Complaints + Payments -->
+<div class="grid-2 fade-in fade-in-delay-3">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Recent Complaints</div>
+            <div style="display:flex;gap:8px;">
+                <a href="{% url 'submit_complaint' %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-plus"></i> New</a>
+                <a href="{% url 'my_complaints' %}" class="btn btn-outline btn-sm">View All</a>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr><th>Subject</th><th>Status</th></tr></thead>
+                <tbody>
+                    {% for c in complaints %}
+                    <tr>
+                        <td style="font-size:13px;font-weight:500;">{{ c.subject|truncatechars:35 }}</td>
+                        <td>
+                            <span class="badge {% if c.status == 'open' %}badge-danger{% elif c.status == 'in_progress' %}badge-warning{% elif c.status == 'resolved' %}badge-success{% else %}badge-gray{% endif %}">
+                                {{ c.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="2" class="text-center" style="padding:24px;color:var(--gray-400);">No complaints</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Recent Payments</div>
+            <a href="{% url 'pay_fee' %}" class="btn btn-gold btn-sm">
+    <i class="fa-solid fa-bolt"></i> Pay Now
+</a>
+            <a href="{% url 'my_payments' %}" class="btn btn-outline btn-sm">View All</a>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr><th>Month</th><th>Amount</th><th>Status</th></tr></thead>
+                <tbody>
+                    {% for p in payments %}
+                    <tr>
+                        <td style="font-size:13px;font-weight:500;">{{ p.month }}</td>
+                        <td style="font-weight:600;color:var(--success);">₹{{ p.amount }}</td>
+                        <td>
+                            <span class="badge {% if p.status == 'paid' %}badge-success{% elif p.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
+                                {{ p.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="text-center" style="padding:24px;color:var(--gray-400);">No payment records</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
