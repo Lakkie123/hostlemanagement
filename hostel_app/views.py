@@ -18,8 +18,12 @@ def is_admin(user):
 
 
 # ─── Public Views ──────────────────────────────────────────────────────────────
-
 def home(request):
+    if request.user.is_authenticated:
+        if request.user.is_staff:
+            return redirect('admin_dashboard')
+        return redirect('student_dashboard')
+    
     facilities = HostelFacility.objects.filter(is_active=True)
     notices = Notice.objects.filter(is_active=True)[:5]
     total_rooms = Room.objects.count()
