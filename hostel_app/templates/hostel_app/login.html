@@ -124,6 +124,21 @@
     margin-bottom: 28px;
 }
 .admin-hint strong { color: var(--navy); }
+
+@media (max-width: 768px) {
+    .auth-layout {
+        grid-template-columns: 1fr;
+        min-height: calc(100vh - 58px);
+    }
+    .auth-left { display: none; }
+    .auth-right {
+        padding: 30px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .auth-form-card { width: 100%; }
+}
 </style>
 
 <div class="auth-layout">
