@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: hostel-management
-    env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn hostel_management.wsgi:application"
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.9

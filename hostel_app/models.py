@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
- 
+
 class StudentProfile(models.Model):
     GENDER_CHOICES = [('M', 'Male'), ('F', 'Female'), ('O', 'Other')]
     STATUS_CHOICES = [('active', 'Active'), ('inactive', 'Inactive'), ('pending', 'Pending')]
@@ -26,11 +26,11 @@ class StudentProfile(models.Model):
 
 
 class RoomType(models.Model):
-    name = models.CharField(max_length=50)  # Single, Double, Triple, Dormitory
+    name = models.CharField(max_length=50)
     capacity = models.IntegerField()
     price_per_month = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(blank=True)
-    amenities = models.TextField(blank=True)  # JSON-like comma separated
+    amenities = models.TextField(blank=True)
 
     def __str__(self):
         return f"{self.name} - ₹{self.price_per_month}/month"
@@ -88,18 +88,14 @@ class RoomAllocation(models.Model):
     notes = models.TextField(blank=True)
     allocated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='allocations_made')
     created_at = models.DateTimeField(auto_now_add=True)
-def __str__(self):
-    return f"{self.student.user.get_full_name()} → Room {self.room.room_number}"
+
+    def __str__(self):
+        return f"{self.student.user.get_full_name()} → Room {self.room.room_number}"
 
     class Meta:
         ordering = ['-created_at']
 
 
-    def __str__(self):
-        return f"{self.allocation.student} - {self.month} - ₹{self.amount}"
-    
-    
-     
 def slip_upload_path(instance, filename):
     ext = filename.split('.')[-1]
     student_name = instance.allocation.student.user.get_full_name().replace(' ', '_')
@@ -127,8 +123,6 @@ class FeePayment(models.Model):
 
     def __str__(self):
         return f"{self.allocation.student} - {self.month} - ₹{self.amount}"
-    
-    
 
 
 class Complaint(models.Model):
@@ -212,7 +206,7 @@ class Visitor(models.Model):
 class HostelFacility(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    icon = models.CharField(max_length=50, default='fa-check')  # Font Awesome icon
+    icon = models.CharField(max_length=50, default='fa-check')
     is_active = models.BooleanField(default=True)
     timing = models.CharField(max_length=100, blank=True)
 
