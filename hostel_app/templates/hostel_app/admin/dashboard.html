@@ -13,51 +13,68 @@
 </div>
 
 <!-- Stats -->
-<a href="{% url 'student_list' %}?status=active" style="text-decoration:none;">
-    <div class="stat-card" style="cursor:pointer;">
-        <div class="stat-icon navy"><i class="fa-solid fa-users"></i></div>
-        <div class="stat-info">
-            <div class="stat-value">{{ total_students }}</div>
-            <div class="stat-label">Active Students</div>
+<div class="stats-grid fade-in fade-in-delay-1">
+
+    <a href="{% url 'manage_students' %}?status=active" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;">
+            <div class="stat-icon navy"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">{{ total_students }}</div>
+                <div class="stat-label">Active Students</div>
+            </div>
         </div>
-    </div>
-</a>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon success"><i class="fa-solid fa-door-open"></i></div>
-        <div class="stat-info">
-            <div class="stat-value">{{ available_rooms }}</div>
-            <div class="stat-label">Available Rooms</div>
+    </a>
+
+    <a href="{% url 'available_rooms' %}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;">
+            <div class="stat-icon success"><i class="fa-solid fa-door-open"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">{{ available_rooms }}</div>
+                <div class="stat-label">Available Rooms</div>
+            </div>
         </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon info"><i class="fa-solid fa-bed"></i></div>
-        <div class="stat-info">
-            <div class="stat-value">{{ occupied_rooms }}</div>
-            <div class="stat-label">Occupied Rooms</div>
+    </a>
+
+    <a href="{% url 'manage_rooms' %}?status=occupied" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;">
+            <div class="stat-icon info"><i class="fa-solid fa-bed"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">{{ occupied_rooms }}</div>
+                <div class="stat-label">Occupied Rooms</div>
+            </div>
         </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon warning"><i class="fa-solid fa-user-clock"></i></div>
-        <div class="stat-info">
-            <div class="stat-value">{{ pending_students }}</div>
-            <div class="stat-label">Pending Approvals</div>
+    </a>
+
+    <a href="{% url 'manage_students' %}?status=pending" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;">
+            <div class="stat-icon warning"><i class="fa-solid fa-user-clock"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">{{ pending_students }}</div>
+                <div class="stat-label">Pending Approvals</div>
+            </div>
         </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
-        <div class="stat-info">
-            <div class="stat-value">{{ open_complaints }}</div>
-            <div class="stat-label">Open Complaints</div>
+    </a>
+
+    <a href="{% url 'manage_complaints' %}?status=open" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;">
+            <div class="stat-icon danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">{{ open_complaints }}</div>
+                <div class="stat-label">Open Complaints</div>
+            </div>
         </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon gold"><i class="fa-solid fa-indian-rupee-sign"></i></div>
-        <div class="stat-info">
-            <div class="stat-value">₹{{ total_revenue|floatformat:0 }}</div>
-            <div class="stat-label">Total Revenue</div>
+    </a>
+
+    <a href="{% url 'manage_fees' %}?status=paid" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;">
+            <div class="stat-icon gold"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">₹{{ total_revenue|floatformat:0 }}</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
         </div>
-    </div>
+    </a>
+
 </div>
 
 <!-- Room Status Chart -->
@@ -69,22 +86,35 @@
         </div>
         <div class="card-body">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                <div style="background:rgba(26,158,110,0.08);border-radius:12px;padding:20px;text-align:center;">
-                    <div style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--success);">{{ room_status_data.available }}</div>
-                    <div style="font-size:13px;color:var(--gray-600);margin-top:4px;">Available</div>
-                </div>
-                <div style="background:rgba(34,114,195,0.08);border-radius:12px;padding:20px;text-align:center;">
-                    <div style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--info);">{{ room_status_data.occupied }}</div>
-                    <div style="font-size:13px;color:var(--gray-600);margin-top:4px;">Occupied</div>
-                </div>
-                <div style="background:rgba(224,124,31,0.08);border-radius:12px;padding:20px;text-align:center;">
-                    <div style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--warning);">{{ room_status_data.maintenance }}</div>
-                    <div style="font-size:13px;color:var(--gray-600);margin-top:4px;">Maintenance</div>
-                </div>
-                <div style="background:rgba(201,162,39,0.08);border-radius:12px;padding:20px;text-align:center;">
-                    <div style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--gold);">{{ room_status_data.reserved }}</div>
-                    <div style="font-size:13px;color:var(--gray-600);margin-top:4px;">Reserved</div>
-                </div>
+
+                <a href="{% url 'available_rooms' %}" style="text-decoration:none;">
+                    <div style="background:rgba(26,158,110,0.08);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all 0.28s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--success);">{{ room_status_data.available }}</div>
+                        <div style="font-size:13px;color:var(--gray-600);margin-top:4px;">Available</div>
+                    </div>
+                </a>
+
+                <a href="{% url 'manage_rooms' %}?status=occupied" style="text-decoration:none;">
+                    <div style="background:rgba(34,114,195,0.08);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all 0.28s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--info);">{{ room_status_data.occupied }}</div>
+                        <div style="font-size:13px;color:var(--gray-600);margin-top:4px;">Occupied</div>
+                    </div>
+                </a>
+
+                <a href="{% url 'manage_rooms' %}?status=maintenance" style="text-decoration:none;">
+                    <div style="background:rgba(224,124,31,0.08);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all 0.28s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--warning);">{{ room_status_data.maintenance }}</div>
+                        <div style="font-size:13px;color:var(--gray-600);margin-top:4px;">Maintenance</div>
+                    </div>
+                </a>
+
+                <a href="{% url 'manage_rooms' %}?status=reserved" style="text-decoration:none;">
+                    <div style="background:rgba(201,162,39,0.08);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all 0.28s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--gold);">{{ room_status_data.reserved }}</div>
+                        <div style="font-size:13px;color:var(--gray-600);margin-top:4px;">Reserved</div>
+                    </div>
+                </a>
+
             </div>
 
             <div style="margin-top:24px;">
@@ -155,7 +185,7 @@
                 </thead>
                 <tbody>
                     {% for alloc in recent_allocations %}
-                    <tr>
+                    <tr style="cursor:pointer;" onclick="window.location='{% url 'student_detail' alloc.student.pk %}'">
                         <td>
                             <div style="font-weight:600;font-size:14px;">{{ alloc.student.user.get_full_name }}</div>
                             <div style="font-size:12px;color:var(--gray-400);">{{ alloc.student.roll_number }}</div>
@@ -187,7 +217,7 @@
                 </thead>
                 <tbody>
                     {% for c in recent_complaints %}
-                    <tr>
+                    <tr style="cursor:pointer;" onclick="window.location='{% url 'manage_complaints' %}'">
                         <td>
                             <div style="font-size:13px;font-weight:600;">{{ c.subject|truncatechars:30 }}</div>
                             <div style="font-size:12px;color:var(--gray-400);">{{ c.student.user.get_full_name }}</div>
@@ -225,7 +255,7 @@
             </thead>
             <tbody>
                 {% for p in recent_payments %}
-                <tr>
+                <tr style="cursor:pointer;" onclick="window.location='{% url 'manage_fees' %}'">
                     <td style="font-weight:600;font-size:14px;">{{ p.allocation.student.user.get_full_name }}</td>
                     <td style="font-size:13px;">{{ p.month }}</td>
                     <td style="font-weight:600;color:var(--success);">₹{{ p.amount }}</td>
