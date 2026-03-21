@@ -1,0 +1,52 @@
+{% extends 'hostel_app/base.html' %}
+{% block title %}Verify OTP — HostelHub{% endblock %}
+{% block body %}
+
+<div style="min-height:calc(100vh - 68px - 60px);display:flex;align-items:center;justify-content:center;padding:40px 20px;">
+    <div style="width:100%;max-width:440px;">
+        <div class="card fade-in">
+            <div class="card-body" style="padding:40px;text-align:center;">
+
+                <div style="width:72px;height:72px;background:rgba(201,162,39,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+                    <i class="fa-solid fa-envelope-circle-check" style="font-size:28px;color:var(--gold);"></i>
+                </div>
+
+                <h2 style="font-family:'Playfair Display',serif;font-size:26px;color:var(--navy);margin-bottom:8px;">
+                    Email Verify Karo
+                </h2>
+                <p style="color:var(--gray-600);font-size:14px;margin-bottom:6px;">
+                    OTP bheja gaya hai:
+                </p>
+                <p style="font-weight:700;color:var(--navy);font-size:15px;margin-bottom:28px;">
+                    {{ email }}
+                </p>
+
+                <form method="post" action="{% url 'register' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" name="otp" class="form-control"
+                               placeholder="6 digit OTP daalo"
+                               style="text-align:center;font-size:24px;font-weight:700;letter-spacing:8px;"
+                               maxlength="6" autofocus required>
+                    </div>
+                    <button type="submit" class="btn btn-gold btn-lg" style="width:100%;justify-content:center;">
+                        <i class="fa-solid fa-check"></i> Verify & Register
+                    </button>
+                </form>
+
+                <div style="margin-top:20px;font-size:13px;color:var(--gray-400);">
+                    <i class="fa-solid fa-clock"></i> OTP 10 minute tak valid hai
+                </div>
+                <div style="margin-top:8px;font-size:13px;color:var(--gray-400);">
+                    Spam/Junk folder bhi check karo
+                </div>
+
+                <a href="{% url 'register' %}" style="display:block;margin-top:20px;font-size:13px;color:var(--gold);font-weight:600;text-decoration:none;">
+                    ← Wapas Register Form pe jao
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
