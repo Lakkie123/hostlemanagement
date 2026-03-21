@@ -613,3 +613,18 @@ def pending_verifications(request):
         status='pending', transaction_id__gt=''
     ).select_related('allocation__student__user', 'allocation__room').order_by('-created_at')
     return render(request, 'hostel_app/admin/pending_verifications.html', {'payments': payments})
+
+
+def about(request):
+    previews = [
+        ('🛏️', 'Hostel Rooms'),
+        ('📚', 'Study Area'),
+        ('🏏', 'Sports Ground'),
+        ('🍽️', 'Mess Hall'),
+        ('🎭', 'Cultural Events'),
+        ('🏛️', 'Campus Building'),
+    ]
+    return render(request, 'hostel_app/about.html', {'previews': previews})
+
+def gallery(request):
+    return render(request, 'hostel_app/gallery.html')

@@ -43,7 +43,9 @@ urlpatterns = [
     path('admin-panel/fees/<int:pk>/verify/', views.verify_payment, name='verify_payment'),
     path('admin-panel/fees/pending/', views.pending_verifications, name='pending_verifications'),
     
-
+    #about and gallery
+    path('about/', views.about, name='about'),
+    path('gallery/', views.gallery, name='gallery'),
     # API
     path('api/room-stats/', views.room_stats_api, name='room_stats_api'),
 ]

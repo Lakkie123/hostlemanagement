@@ -1,0 +1,565 @@
+{% extends 'hostel_app/base.html' %}
+{% block title %}Gallery — HostelHub{% endblock %}
+{% block body %}
+
+<style>
+.gallery-hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #1e3a5f 100%);
+    padding: 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.gallery-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a227' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.gallery-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 12px;
+    position: relative;
+}
+.gallery-hero h1 span { color: var(--gold); }
+.gallery-hero p {
+    color: rgba(255,255,255,0.7);
+    font-size: 16px;
+    position: relative;
+}
+
+/* Filter Tabs */
+.gallery-filters {
+    background: var(--white);
+    padding: 20px 60px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    border-bottom: 2px solid var(--gray-200);
+    position: sticky;
+    top: 68px;
+    z-index: 100;
+}
+.filter-pill {
+    padding: 8px 20px;
+    border-radius: 99px;
+    border: 2px solid var(--gray-200);
+    background: white;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.filter-pill:hover { border-color: var(--navy); color: var(--navy); }
+.filter-pill.active {
+    background: var(--navy);
+    color: white;
+    border-color: var(--navy);
+}
+
+/* Gallery Grid */
+.gallery-section { padding: 40px 60px; }
+
+.gallery-category {
+    margin-bottom: 48px;
+}
+.category-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.category-title::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+    border-radius: 99px;
+}
+
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.photo-card {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    transition: var(--transition);
+    cursor: pointer;
+    position: relative;
+    background: var(--gray-100);
+    aspect-ratio: 4/3;
+}
+.photo-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+.photo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+.photo-card:hover img { transform: scale(1.05); }
+
+.photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10,22,40,0.8) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: flex-end;
+    padding: 16px;
+}
+.photo-card:hover .photo-overlay { opacity: 1; }
+.photo-caption {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Emoji placeholder cards (when no image) */
+.photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
+    gap: 10px;
+}
+.photo-placeholder .emoji { font-size: 48px; }
+.photo-placeholder .label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-600);
+}
+
+/* Lightbox */
+.lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 12px;
+    object-fit: contain;
+}
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.lightbox-close:hover { background: rgba(255,255,255,0.3); }
+.lightbox-caption {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    background: rgba(0,0,0,0.5);
+    padding: 8px 20px;
+    border-radius: 99px;
+    white-space: nowrap;
+}
+
+/* Logo Grid */
+.logo-section {
+    background: var(--white);
+    padding: 40px 60px;
+    border-top: 2px solid var(--gray-200);
+}
+.logo-section h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--navy);
+    margin-bottom: 24px;
+    text-align: center;
+}
+.logo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+}
+.logo-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    background: var(--white);
+    transition: var(--transition);
+    text-decoration: none;
+    min-width: 120px;
+}
+.logo-item:hover {
+    border-color: var(--gold);
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+.logo-item img {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+}
+.logo-item span {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .gallery-hero { padding: 40px 20px; }
+    .gallery-hero h1 { font-size: 30px; }
+    .gallery-filters { padding: 16px 20px; }
+    .gallery-section { padding: 24px 16px; }
+    .photo-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .logo-section { padding: 30px 20px; }
+}
+
+@media (max-width: 480px) {
+    .photo-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+}
+</style>
+
+<!-- HERO -->
+<div class="gallery-hero">
+    <div style="display:inline-block;background:rgba(201,162,39,0.15);color:var(--gold);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:6px;margin-bottom:14px;position:relative;">
+        Government Polytechnic Dehradun
+    </div>
+    <h1>Our <span>Gallery</span></h1>
+    <p>A glimpse into hostel life — rooms, activities, sports, and campus moments</p>
+</div>
+
+<!-- FILTERS -->
+<div class="gallery-filters">
+    <button class="filter-pill active" onclick="filterGallery('all', this)">
+        <i class="fa-solid fa-grid"></i> All Photos
+    </button>
+    <button class="filter-pill" onclick="filterGallery('rooms', this)">
+        <i class="fa-solid fa-bed"></i> Rooms
+    </button>
+    <button class="filter-pill" onclick="filterGallery('sports', this)">
+        <i class="fa-solid fa-futbol"></i> Sports
+    </button>
+    <button class="filter-pill" onclick="filterGallery('activities', this)">
+        <i class="fa-solid fa-music"></i> Activities
+    </button>
+    <button class="filter-pill" onclick="filterGallery('mess', this)">
+        <i class="fa-solid fa-utensils"></i> Mess
+    </button>
+    <button class="filter-pill" onclick="filterGallery('campus', this)">
+        <i class="fa-solid fa-building"></i> Campus
+    </button>
+</div>
+
+<!-- GALLERY -->
+<div class="gallery-section">
+
+    <!-- Rooms -->
+    <div class="gallery-category" data-category="rooms">
+        <div class="category-title"><i class="fa-solid fa-bed" style="color:var(--gold);"></i> Hostel Rooms</div>
+        <div class="photo-grid">
+            <div class="photo-card" onclick="openLightbox('/static/gallery/room.jpg', 'Girls Hostel Room')">
+                <img src="/static/gallery/room.jpg" alt="Girls Hostel Room"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="photo-placeholder" style="display:none;">
+                    <div class="emoji">🛏️</div>
+                    <div class="label">Girls Hostel Room</div>
+                </div>
+                <div class="photo-overlay"><div class="photo-caption">Girls Hostel Room</div></div>
+            </div>
+            <div class="photo-card" onclick="openLightbox('/static/pj images/dormitory.png', 'Dormitory')">
+                <img src="/static/pj images/dormitory.png" alt="Dormitory"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="photo-placeholder" style="display:none;">
+                    <div class="emoji">🏨</div>
+                    <div class="label">Dormitory</div>
+                </div>
+                <div class="photo-overlay"><div class="photo-caption">Dormitory</div></div>
+            </div>
+            <div class="photo-card" onclick="openLightbox('/static/gallery/studyroom.jpg', 'Study Room')">
+                <img src="/static/gallery/studyroom.jpg" alt="Study Room"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="photo-placeholder" style="display:none;">
+                    <div class="emoji">📚</div>
+                    <div class="label">Study Room</div>
+                </div>
+                <div class="photo-overlay"><div class="photo-caption">Study Room</div></div>
+            </div>
+            <div class="photo-card" onclick="openLightbox('/static/gallery/common.jpg', 'Common Room')">
+                <img src="/static/gallery/common.jpg" alt="Common Room"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="photo-placeholder" style="display:none;">
+                    <div class="emoji">🛋️</div>
+                    <div class="label">Common Room</div>
+                </div>
+                <div class="photo-overlay"><div class="photo-caption">Common Room</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sports -->
+    <div class="gallery-category" data-category="sports">
+        <div class="category-title"><i class="fa-solid fa-futbol" style="color:var(--gold);"></i> Sports Activities</div>
+        <div class="photo-grid">
+            <div class="photo-card" onclick="openLightbox('/static/gallery/sports.jpg', 'Sports Ground')">
+                <img src="/static/gallery/sports.jpg" alt="Sports"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="photo-placeholder" style="display:none;">
+                    <div class="emoji">🏏</div>
+                    <div class="label">Cricket Ground</div>
+                </div>
+                <div class="photo-overlay"><div class="photo-caption">Sports Ground</div></div>
+            </div>
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <div class="emoji">⚽</div>
+                    <div class="label">Football</div>
+                </div>
+            </div>
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <div class="emoji">🏐</div>
+                    <div class="label">Volleyball</div>
+                </div>
+            </div>
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <div class="emoji">♟️</div>
+                    <div class="label">Indoor Games</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activities -->
+    <div class="gallery-category" data-category="activities">
+        <div class="category-title"><i class="fa-solid fa-music" style="color:var(--gold);"></i> Cultural Activities</div>
+        <div class="photo-grid">
+            <div class="photo-card" onclick="openLightbox('/static/gallery/event.jpg', 'Cultural Event')">
+                <img src="/static/gallery/event.jpg" alt="Cultural events"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="photo-placeholder" style="display:none;">
+                    <div class="emoji">🎭</div>
+                    <div class="label">Cultural Events</div>
+                </div>
+                <div class="photo-overlay"><div class="photo-caption">Cultural Events</div></div>
+            </div>
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <div class="emoji">💃</div>
+                    <div class="label">Dance Performance</div>
+                </div>
+            </div>
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <div class="emoji">🎤</div>
+                    <div class="label">Singing</div>
+                </div>
+            </div>
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <div class="emoji">🎪</div>
+                    <div class="label">Festival Celebrations</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mess -->
+    <div class="gallery-category" data-category="mess">
+        <div class="category-title"><i class="fa-solid fa-utensils" style="color:var(--gold);"></i> Mess & Dining</div>
+        <div class="photo-grid">
+            <div class="photo-card" onclick="openLightbox('/static/gallery/mess.png', 'Mess Hall')">
+                <img src="/static/gallery/mess.png" alt="Mess and dining hall"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="photo-placeholder" style="display:none;">
+                    <div class="emoji">🍽️</div>
+                    <div class="label">Dining Hall</div>
+                </div>
+                <div class="photo-overlay"><div class="photo-caption">Mess Hall</div></div>
+            </div>
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <div class="emoji">🥘</div>
+                    <div class="label">Fresh Meals</div>
+                </div>
+            </div>
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <div class="emoji">🍱</div>
+                    <div class="label">Nutritious Food</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campus -->
+    <div class="gallery-category" data-category="campus">
+        <div class="category-title"><i class="fa-solid fa-building" style="color:var(--gold);"></i> Campus</div>
+        <div class="photo-grid">
+            <div class="photo-card" onclick="openLightbox('/static/pj images/unnamed.webp', 'Hostel Building')">
+                <img src="/static/pj images/unnamed.webp" alt="Hostel building"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="photo-placeholder" style="display:none;">
+                    <div class="emoji">🏛️</div>
+                    <div class="label">Hostel Building</div>
+                </div>
+                <div class="photo-overlay"><div class="photo-caption">Hostel Building</div></div>
+            </div>
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <div class="emoji">📖</div>
+                    <div class="label">Library</div>
+                </div>
+            </div>
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <div class="emoji">💻</div>
+                    <div class="label">Computer Lab</div>
+                </div>
+            </div>
+            <div class="photo-card">
+                <div class="photo-placeholder">
+                    <div class="emoji">🏥</div>
+                    <div class="label">Medical Room</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- PARTNER LOGOS -->
+<div class="logo-section">
+    <h3>Our Partners & Resources</h3>
+    <div class="logo-grid">
+        <a href="https://ndl.iitkgp.ac.in/" target="_blank" class="logo-item">
+            <img src="/static/pj images/download.jpeg" alt="NDL"
+                 onerror="this.style.display='none';">
+            <span>National Digital Library</span>
+        </a>
+        <a href="https://swayam.gov.in/" target="_blank" class="logo-item">
+            <img src="/static/pj images/Screenshot 2025-09-16 054551.png" alt="Swayam"
+                 onerror="this.style.display='none';">
+            <span>Swayam</span>
+        </a>
+        <a href="https://epgp.inflibnet.ac.in/" target="_blank" class="logo-item">
+            <img src="/static/pj images/Screenshot 2025-09-16 054743.png" alt="E-Pathshala"
+                 onerror="this.style.display='none';">
+            <span>E-Pathshala</span>
+        </a>
+        <a href="https://ubter.in/" target="_blank" class="logo-item">
+            <img src="/static/pj images/ubter.png" alt="UBTER"
+                 onerror="this.style.display='none';">
+            <span>UBTER</span>
+        </a>
+        <a href="https://www.swayamprabha.gov.in/" target="_blank" class="logo-item">
+            <img src="/static/pj images/Screenshot 2025-09-16 054931.png" alt="Swayam Prabha"
+                 onerror="this.style.display='none';">
+            <span>Swayam Prabha</span>
+        </a>
+        <a href="https://aicte-india.org/" target="_blank" class="logo-item">
+            <span style="font-size:22px;">🎓</span>
+            <span>AICTE</span>
+        </a>
+        <a href="https://gpdehradun.org.in/" target="_blank" class="logo-item">
+            <img src="/static/pj images/logo-min1.webp" alt="GPD"
+                 onerror="this.style.display='none';">
+            <span>Govt. Poly. Dehradun</span>
+        </a>
+        <a href="https://scholarships.gov.in/" target="_blank" class="logo-item">
+            <span style="font-size:22px;">📋</span>
+            <span>Scholarship Portal</span>
+        </a>
+    </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightbox-img" src="" alt="">
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+</div>
+
+<script>
+// Lightbox
+function openLightbox(src, caption) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox-caption').textContent = caption;
+    document.getElementById('lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+// Filter gallery
+function filterGallery(category, btn) {
+    // Update active pill
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+
+    const categories = document.querySelectorAll('.gallery-category');
+    categories.forEach(cat => {
+        if (category === 'all' || cat.dataset.category === category) {
+            cat.style.display = 'block';
+        } else {
+            cat.style.display = 'none';
+        }
+    });
+}
+
+// Keyboard close lightbox
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeLightbox();
+});
+</script>
+
+{% endblock %}

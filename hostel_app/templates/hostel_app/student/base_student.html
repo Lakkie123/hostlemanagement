@@ -43,6 +43,13 @@
         <a href="{% url 'home' %}" class="sidebar-link">
             <i class="fa-solid fa-house"></i> Home
         </a>
+        <div class="sidebar-label">Information</div>
+<a href="{% url 'about' %}" class="sidebar-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+    <i class="fa-solid fa-circle-info"></i> About Hostel
+</a>
+<a href="{% url 'gallery' %}" class="sidebar-link {% if request.resolver_match.url_name == 'gallery' %}active{% endif %}">
+    <i class="fa-solid fa-images"></i> Gallery
+</a>
         <a href="{% url 'logout' %}" class="sidebar-link" style="color:rgba(217,79,79,0.8);">
             <i class="fa-solid fa-right-from-bracket"></i> Logout
         </a>
