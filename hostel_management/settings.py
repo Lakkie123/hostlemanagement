@@ -49,10 +49,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'hostel_management.wsgi.application'
-
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL', f'sqlite:///{BASE_DIR}/hostel.db'),
+        default=f'sqlite:///{BASE_DIR}/hostel.db',
         conn_max_age=600
     )
 }
@@ -86,3 +85,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'sm2721857@gmail.com')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'dxze zzmy pqqc axlf')
 DEFAULT_FROM_EMAIL = 'HostelHub <sm2721857@gmail.com>'
+EMAIL_TIMEOUT = 5

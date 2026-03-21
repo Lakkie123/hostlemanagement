@@ -85,7 +85,9 @@ def register_view(request):
             request.session['reg_email'] = email
             request.session['reg_form_data'] = request.POST.dict()
             request.session.set_expiry(600)
-
+            
+            import socket
+            socket.setdefaulttimeout(5)
             try:
                 send_mail(
                     subject='HostelHub — Email Verification OTP',
