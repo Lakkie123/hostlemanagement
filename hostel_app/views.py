@@ -107,13 +107,9 @@ Government Polytechnic Dehradun''',
                 )
                 messages.success(request, f'✅ OTP bheja gaya {email} pe!')
                 return render(request, 'hostel_app/otp_verify.html', {'email': email})
-            except Exception as e:
-                messages.error(request, 'Email bhejne mein problem aayi. Dobara try karo.')
-        else:
-            messages.error(request, 'Please correct the errors below.')
-    else:
-        form = StudentRegistrationForm()
-
+         except Exception as e:
+    form = StudentRegistrationForm(request.POST)
+    form.add_error('email', 'Ye email valid nahi hai ya exist nahi karti. Sahi email daalo.')
     return render(request, 'hostel_app/register.html', {'form': form})
 
 def login_view(request):
