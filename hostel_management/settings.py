@@ -87,5 +87,5 @@ EMAIL_HOST_USER = os.environ.get(
 EMAIL_HOST_PASSWORD = os.environ.get(
     'EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get(
-    'DEFAULT_FROM_EMAIL', 'HostelHub <sm2721857@gmail.com>')
+    'DEFAULT_FROM_EMAIL', 'HostelHub <sahilmehtaboss@gmail.com>')
 EMAIL_TIMEOUT = 30
