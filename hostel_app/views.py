@@ -85,9 +85,7 @@ def register_view(request):
             request.session['reg_email'] = email
             request.session['reg_form_data'] = request.POST.dict()
             request.session.set_expiry(600)
-            
-            import socket
-            socket.setdefaulttimeout(5)
+
             try:
                 send_mail(
                     subject='HostelHub — Email Verification OTP',
@@ -108,11 +106,10 @@ Government Polytechnic Dehradun''',
                 messages.success(request, f'✅ OTP bheja gaya {email} pe! Spam folder bhi check karo.')
                 return render(request, 'hostel_app/otp_verify.html', {'email': email})
             except Exception as e:
-                form = StudentRegistrationForm(request.POST)
-                form.add_error('email', 'Ye email valid nahi hai ya exist nahi karti. Sahi email daalo.')
+                messages.error(request, f'❌ Email send nahi ho saki. Error: {str(e)[:100]}. Thodi der baad try karo.')
                 return render(request, 'hostel_app/register.html', {'form': form})
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, 'Please fix the errors below before submitting.')
     else:
         form = StudentRegistrationForm()
 
