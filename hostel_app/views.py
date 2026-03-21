@@ -49,7 +49,6 @@ def register_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
 
-    # OTP verify karna hai
     if request.method == 'POST' and 'otp' in request.POST:
         otp_entered = request.POST.get('otp')
         otp_saved = request.session.get('reg_otp')
@@ -76,7 +75,6 @@ def register_view(request):
             messages.error(request, '❌ Galat OTP! Dobara try karo.')
             return render(request, 'hostel_app/otp_verify.html', {'email': otp_email})
 
-    # Registration form submit
     if request.method == 'POST' and 'otp' not in request.POST:
         form = StudentRegistrationForm(request.POST)
         if form.is_valid():
@@ -88,7 +86,7 @@ def register_view(request):
             request.session['reg_form_data'] = request.POST.dict()
             request.session.set_expiry(600)
 
-          try:
+            try:
                 send_mail(
                     subject='HostelHub — Email Verification OTP',
                     message=f'''Namaskar!
@@ -111,6 +109,12 @@ Government Polytechnic Dehradun''',
                 form = StudentRegistrationForm(request.POST)
                 form.add_error('email', 'Ye email valid nahi hai ya exist nahi karti. Sahi email daalo.')
                 return render(request, 'hostel_app/register.html', {'form': form})
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = StudentRegistrationForm()
+
+    return render(request, 'hostel_app/register.html', {'form': form})
 
 def login_view(request):
     if request.user.is_authenticated:
