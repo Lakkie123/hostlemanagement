@@ -13,13 +13,15 @@
 </div>
 
 <!-- Stats -->
-<div class="stats-grid fade-in fade-in-delay-1">
-    <div class="stat-card">
+<a href="{% url 'student_list' %}?status=active" style="text-decoration:none;">
+    <div class="stat-card" style="cursor:pointer;">
         <div class="stat-icon navy"><i class="fa-solid fa-users"></i></div>
         <div class="stat-info">
             <div class="stat-value">{{ total_students }}</div>
             <div class="stat-label">Active Students</div>
         </div>
+    </div>
+</a>
     </div>
     <div class="stat-card">
         <div class="stat-icon success"><i class="fa-solid fa-door-open"></i></div>
