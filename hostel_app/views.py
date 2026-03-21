@@ -8,7 +8,7 @@ from django.utils import timezone
 from datetime import date
 # import random
 #from django.core.mail import send_mail
-f#rom django.conf import settings
+#from django.conf import settings
 
 from .models import (StudentProfile, Room, RoomType, RoomAllocation,
                      FeePayment, Complaint, Notice, Visitor, HostelFacility)
