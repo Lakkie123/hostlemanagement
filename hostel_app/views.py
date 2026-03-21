@@ -11,6 +11,10 @@ from .models import (StudentProfile, Room, RoomType, RoomAllocation,
 from .forms import (StudentRegistrationForm, LoginForm, RoomForm,
                     RoomAllocationForm, FeePaymentForm, ComplaintForm,
                     NoticeForm, VisitorForm, ProfileUpdateForm)
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
+from django.http import HttpResponse
 
 
 def is_admin(user):
@@ -366,15 +370,17 @@ def available_rooms(request):
     rooms = Room.objects.filter(status='available').select_related('room_type')
     return render(request, 'hostel_app/admin/available_rooms.html', {'rooms': rooms})
 
-
 @login_required
 @user_passes_test(is_admin)
 def manage_students(request):
     students = StudentProfile.objects.select_related('user').all().order_by('-created_at')
     status_filter = request.GET.get('status', '')
+    gender_filter = request.GET.get('gender', '')
     search = request.GET.get('search', '')
     if status_filter:
         students = students.filter(status=status_filter)
+    if gender_filter:
+        students = students.filter(gender=gender_filter)
     if search:
         students = students.filter(
             Q(user__first_name__icontains=search) |
@@ -385,10 +391,13 @@ def manage_students(request):
     return render(request, 'hostel_app/admin/students.html', {
         'students': students,
         'status_filter': status_filter,
+        'gender_filter': gender_filter,
         'search': search,
+        'boys_count': StudentProfile.objects.filter(gender='M').count(),
+        'girls_count': StudentProfile.objects.filter(gender='F').count(),
     })
-
-
+    
+    
 @login_required
 @user_passes_test(is_admin)
 def student_detail(request, pk):
@@ -628,3 +637,112 @@ def about(request):
 
 def gallery(request):
     return render(request, 'hostel_app/gallery.html')
+
+
+
+
+@login_required
+@user_passes_test(is_admin)
+def export_students(request):
+    wb = openpyxl.Workbook()
+
+    NAVY = "0A1628"
+    GOLD = "C9A227"
+    PINK = "C2185B"
+    BLUE = "1A5FA8"
+    WHITE = "FFFFFF"
+    LIGHT_BLUE = "E3F2FD"
+    LIGHT_PINK = "FCE4EC"
+    GRAY = "F4F6FA"
+
+    def make_border():
+        thin = Side(style='thin', color="E8ECF4")
+        return Border(left=thin, right=thin, top=thin, bottom=thin)
+
+    def style_header(cell, bg_color):
+        cell.font = Font(bold=True, color=WHITE, name='Arial', size=11)
+        cell.fill = PatternFill("solid", start_color=bg_color)
+        cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+        cell.border = make_border()
+
+    def style_data(cell, bg_color=None):
+        cell.font = Font(name='Arial', size=10)
+        cell.alignment = Alignment(vertical='center', wrap_text=True)
+        cell.border = make_border()
+        if bg_color:
+            cell.fill = PatternFill("solid", start_color=bg_color)
+
+    def write_sheet(ws, students, title, header_color, row_color):
+        ws.row_dimensions[1].height = 50
+        ws.row_dimensions[2].height = 35
+
+        ws.merge_cells('A1:K1')
+        tc = ws['A1']
+        tc.value = f"Government Polytechnic Dehradun — {title}"
+        tc.font = Font(bold=True, color=WHITE, name='Arial', size=14)
+        tc.fill = PatternFill("solid", start_color=NAVY)
+        tc.alignment = Alignment(horizontal='center', vertical='center')
+
+        headers = ['S.No', 'Full Name', 'Roll Number', 'Course', 'Year',
+                   'Gender', 'Phone', 'Guardian Name', 'Guardian Phone', 'Status', 'Joined']
+        widths = [6, 22, 15, 20, 6, 10, 14, 20, 14, 10, 14]
+
+        for col, (h, w) in enumerate(zip(headers, widths), 1):
+            cell = ws.cell(row=2, column=col, value=h)
+            style_header(cell, header_color)
+            ws.column_dimensions[get_column_letter(col)].width = w
+
+        for i, student in enumerate(students, 1):
+            row = i + 2
+            ws.row_dimensions[row].height = 22
+            bg = row_color if i % 2 == 0 else None
+            data = [
+                i,
+                student.user.get_full_name(),
+                student.roll_number,
+                student.course,
+                student.year_of_study,
+                student.get_gender_display(),
+                student.phone,
+                student.guardian_name,
+                student.guardian_phone,
+                student.get_status_display(),
+                student.created_at.strftime('%d %b %Y') if student.created_at else '',
+            ]
+            for col, value in enumerate(data, 1):
+                cell = ws.cell(row=row, column=col, value=value)
+                style_data(cell, bg)
+                if col == 1:
+                    cell.alignment = Alignment(horizontal='center', vertical='center')
+
+        total_row = len(students) + 3
+        ws.merge_cells(f'A{total_row}:K{total_row}')
+        sc = ws[f'A{total_row}']
+        sc.value = f'Total: {len(students)} Students'
+        sc.font = Font(bold=True, color=NAVY, name='Arial', size=11)
+        sc.fill = PatternFill("solid", start_color=GOLD)
+        sc.alignment = Alignment(horizontal='center', vertical='center')
+        ws.row_dimensions[total_row].height = 25
+
+    boys = list(StudentProfile.objects.filter(gender='M').select_related('user').order_by('roll_number'))
+    girls = list(StudentProfile.objects.filter(gender='F').select_related('user').order_by('roll_number'))
+    all_students = list(StudentProfile.objects.select_related('user').order_by('gender', 'roll_number'))
+
+    ws_all = wb.active
+    ws_all.title = "All Students"
+    write_sheet(ws_all, all_students, "All Students", NAVY, GRAY)
+
+    ws_boys = wb.create_sheet("Boys Hostel")
+    write_sheet(ws_boys, boys, "Boys Hostel", BLUE, LIGHT_BLUE)
+
+    ws_girls = wb.create_sheet("Girls Hostel")
+    write_sheet(ws_girls, girls, "Girls Hostel", PINK, LIGHT_PINK)
+
+    from datetime import date
+    filename = f"Students_{date.today().strftime('%d_%b_%Y')}.xlsx"
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    wb.save(response)
+    return response

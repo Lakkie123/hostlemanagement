@@ -1,17 +1,41 @@
 {% extends 'hostel_app/admin/base_admin.html' %}
 {% block title %}Manage Students — HostelHub{% endblock %}
 {% block admin_content %}
-
 <div class="page-header fade-in">
     <div>
         <div class="page-title">Student Management</div>
         <div class="page-subtitle">{{ students|length }} student(s) found</div>
     </div>
+    <a href="{% url 'export_students' %}" class="btn btn-success">
+        <i class="fa-solid fa-file-excel"></i> Export Excel
+    </a>
 </div>
 
+<!-- Gender Filter Tabs -->
+<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;" class="fade-in">
+    <a href="{% url 'manage_students' %}"
+       class="btn {% if not gender_filter %}btn-primary{% else %}btn-outline{% endif %}">
+        <i class="fa-solid fa-users"></i> All Students
+    </a>
+    <a href="{% url 'manage_students' %}?gender=M"
+       class="btn {% if gender_filter == 'M' %}btn-primary{% else %}btn-outline{% endif %}"
+       style="{% if gender_filter == 'M' %}background:#1a5fa8;color:white;border:none;{% endif %}">
+        <i class="fa-solid fa-mars"></i> Boys Hostel ({{ boys_count }})
+    </a>
+    <a href="{% url 'manage_students' %}?gender=F"
+       class="btn {% if gender_filter == 'F' %}btn-primary{% else %}btn-outline{% endif %}"
+       style="{% if gender_filter == 'F' %}background:#c2185b;color:white;border:none;{% endif %}">
+        <i class="fa-solid fa-venus"></i> Girls Hostel ({{ girls_count }})
+    </a>
+</div>
+
+<!-- Search + Status Filter -->
 <div class="card mb-20 fade-in fade-in-delay-1">
     <div class="card-body" style="padding:16px 24px;">
         <form method="get" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+            {% if gender_filter %}
+            <input type="hidden" name="gender" value="{{ gender_filter }}">
+            {% endif %}
             <div class="search-box">
                 <i class="fa-solid fa-search search-icon"></i>
                 <input type="text" name="search" class="form-control" placeholder="Search by name, roll no..." value="{{ search }}">
@@ -28,18 +52,43 @@
     </div>
 </div>
 
+<!-- Students Table -->
 <div class="card fade-in fade-in-delay-2">
+    <div class="card-header">
+        <div class="card-title">
+            {% if gender_filter == 'M' %}
+            <i class="fa-solid fa-mars" style="color:#1a5fa8;margin-right:8px;"></i> Boys Hostel Students
+            {% elif gender_filter == 'F' %}
+            <i class="fa-solid fa-venus" style="color:#c2185b;margin-right:8px;"></i> Girls Hostel Students
+            {% else %}
+            <i class="fa-solid fa-users" style="color:var(--gold);margin-right:8px;"></i> All Students
+            {% endif %}
+        </div>
+        <div style="display:flex;gap:8px;">
+            <span class="badge badge-navy">{{ students|length }} Students</span>
+        </div>
+    </div>
     <div class="table-wrapper">
         <table>
             <thead>
-                <tr><th>Student</th><th>Roll No.</th><th>Course</th><th>Phone</th><th>Status</th><th>Joined</th><th>Actions</th></tr>
+                <tr>
+                    <th>Student</th>
+                    <th>Roll No.</th>
+                    <th>Course</th>
+                    <th>Gender</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
             </thead>
             <tbody>
                 {% for student in students %}
                 <tr>
                     <td>
                         <div style="display:flex;align-items:center;gap:12px;">
-                            <div class="avatar" style="width:36px;height:36px;border-radius:10px;font-size:13px;">
+                            <div class="avatar" style="width:36px;height:36px;border-radius:10px;font-size:13px;
+                                {% if student.gender == 'F' %}background:#c2185b;{% else %}background:#1a5fa8;{% endif %}">
                                 {{ student.user.first_name|first|upper }}{{ student.user.last_name|first|upper }}
                             </div>
                             <div>
@@ -48,10 +97,27 @@
                             </div>
                         </div>
                     </td>
-                    <td><code style="background:var(--gray-100);padding:3px 8px;border-radius:6px;font-size:13px;">{{ student.roll_number }}</code></td>
+                    <td>
+                        <code style="background:var(--gray-100);padding:3px 8px;border-radius:6px;font-size:13px;">
+                            {{ student.roll_number }}
+                        </code>
+                    </td>
                     <td>
                         <div style="font-size:13px;">{{ student.course }}</div>
                         <div style="font-size:12px;color:var(--gray-400);">Year {{ student.year_of_study }}</div>
+                    </td>
+                    <td>
+                        {% if student.gender == 'F' %}
+                        <span class="badge" style="background:rgba(194,24,91,0.1);color:#c2185b;">
+                            <i class="fa-solid fa-venus"></i> Female
+                        </span>
+                        {% elif student.gender == 'M' %}
+                        <span class="badge" style="background:rgba(26,95,168,0.1);color:#1a5fa8;">
+                            <i class="fa-solid fa-mars"></i> Male
+                        </span>
+                        {% else %}
+                        <span class="badge badge-gray">Other</span>
+                        {% endif %}
                     </td>
                     <td style="font-size:13px;">{{ student.phone }}</td>
                     <td>
@@ -62,7 +128,9 @@
                     <td style="font-size:13px;color:var(--gray-600);">{{ student.created_at|date:"d M Y" }}</td>
                     <td>
                         <div style="display:flex;gap:8px;">
-                            <a href="{% url 'student_detail' student.pk %}" class="btn btn-outline btn-sm" data-tooltip="View Details"><i class="fa-solid fa-eye"></i></a>
+                            <a href="{% url 'student_detail' student.pk %}" class="btn btn-outline btn-sm" data-tooltip="View Details">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
                             {% if student.status == 'pending' %}
                             <a href="{% url 'approve_student' student.pk %}" class="btn btn-success btn-sm" data-tooltip="Approve">
                                 <i class="fa-solid fa-check"></i>
@@ -72,13 +140,20 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="7">
-                    <div class="empty-state">
-                        <i class="fa-solid fa-users"></i>
-                        <h3>No Students Found</h3>
-                        <p>Students will appear here after registration</p>
-                    </div>
-                </td></tr>
+                <tr>
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <i class="fa-solid fa-users"></i>
+                            <h3>No Students Found</h3>
+                            <p>
+                                {% if gender_filter == 'M' %}No boys registered yet.
+                                {% elif gender_filter == 'F' %}No girls registered yet.
+                                {% else %}Students will appear here after registration.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

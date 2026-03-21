@@ -42,6 +42,7 @@ urlpatterns = [
     path('admin-panel/visitors/', views.manage_visitors, name='manage_visitors'),
     path('admin-panel/fees/<int:pk>/verify/', views.verify_payment, name='verify_payment'),
     path('admin-panel/fees/pending/', views.pending_verifications, name='pending_verifications'),
+    path('admin-panel/students/export/', views.export_students, name='export_students'),
     
     #about and gallery
     path('about/', views.about, name='about'),
