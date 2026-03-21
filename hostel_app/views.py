@@ -88,7 +88,7 @@ def register_view(request):
             request.session['reg_form_data'] = request.POST.dict()
             request.session.set_expiry(600)
 
-            try:
+          try:
                 send_mail(
                     subject='HostelHub — Email Verification OTP',
                     message=f'''Namaskar!
@@ -105,12 +105,12 @@ Government Polytechnic Dehradun''',
                     recipient_list=[email],
                     fail_silently=False,
                 )
-                messages.success(request, f'✅ OTP bheja gaya {email} pe!')
+                messages.success(request, f'✅ OTP bheja gaya {email} pe! Spam folder bhi check karo.')
                 return render(request, 'hostel_app/otp_verify.html', {'email': email})
-         except Exception as e:
-    form = StudentRegistrationForm(request.POST)
-    form.add_error('email', 'Ye email valid nahi hai ya exist nahi karti. Sahi email daalo.')
-    return render(request, 'hostel_app/register.html', {'form': form})
+            except Exception as e:
+                form = StudentRegistrationForm(request.POST)
+                form.add_error('email', 'Ye email valid nahi hai ya exist nahi karti. Sahi email daalo.')
+                return render(request, 'hostel_app/register.html', {'form': form})
 
 def login_view(request):
     if request.user.is_authenticated:
