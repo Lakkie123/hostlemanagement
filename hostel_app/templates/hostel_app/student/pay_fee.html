@@ -95,7 +95,7 @@
 <div class="page-header fade-in">
     <div>
         <div class="page-title">Pay Hostel Fee</div>
-        <div class="page-subtitle">GPay, PhonePe, Paytm ya QR se instantly pay karo</div>
+        <div class="page-subtitle">Pay instantly via GPay, PhonePe, Paytm or QR</div>
     </div>
     <a href="{% url 'my_payments' %}" class="btn btn-outline btn-sm">
         <i class="fa-solid fa-clock-rotate-left"></i> Payment History
@@ -105,20 +105,20 @@
 {% if not allocation %}
 <div class="alert alert-warning">
     <i class="fa-solid fa-triangle-exclamation"></i>
-    Koi active room allocation nahi mila. Admin se contact karo.
+     No active room allocation found. Please contact admin.
 </div>
 {% else %}
 
 <!-- Steps -->
 <div class="card mb-24 fade-in fade-in-delay-1">
     <div class="steps-row">
-        <div class="step-dot"><div class="num">1</div><div class="txt">Month Chuno</div></div>
+        <div class="step-dot"><div class="num">1</div><div class="txt">Select Month</div></div>
         <div class="step-line"></div>
-        <div class="step-dot"><div class="num">2</div><div class="txt">QR Scan / App Open</div></div>
+        <div class="step-dot"><div class="num">2</div><div class="txt">Scan QR / Open App</div></div>
         <div class="step-line"></div>
-        <div class="step-dot"><div class="num">3</div><div class="txt">₹{{ allocation.monthly_rent }} Pay Karo</div></div>
+        <div class="step-dot"><div class="num">3</div><div class="txt">Pay ₹{{ allocation.monthly_rent }}</div></div>
         <div class="step-line"></div>
-        <div class="step-dot"><div class="num">4</div><div class="txt">Txn ID Daalo</div></div>
+        <div class="step-dot"><div class="num">4</div><div class="txt">Enter Txn ID</div></div>
         <div class="step-line"></div>
         <div class="step-dot"><div class="num" style="background:var(--success);">✓</div><div class="txt">Done!</div></div>
     </div>
@@ -138,7 +138,7 @@
         <!-- QR Card -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title"><i class="fa-solid fa-qrcode" style="color:var(--gold);margin-right:8px;"></i>QR Code se Pay Karo</div>
+                <div class="card-title"><i class="fa-solid fa-qrcode" style="color:var(--gold);margin-right:8px;"></i>Pay via QR Code</div>
                 <span class="badge badge-success" style="font-size:11px;"><i class="fa-solid fa-circle" style="font-size:7px;"></i> UPI Live</span>
             </div>
             <div class="card-body" style="text-align:center;padding:24px;">
@@ -152,11 +152,11 @@
                         onerror="this.style.display='none';document.getElementById('qr-err').style.display='flex';">
                     <div id="qr-err" style="display:none;width:200px;height:200px;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:#f4f6fa;">
                         <i class="fa-solid fa-qrcode" style="font-size:60px;color:var(--navy);"></i>
-                        <div style="font-size:11px;color:#5a6478;padding:0 10px;">Neeche UPI ID use karo</div>
+                        <div style="font-size:11px;color:#5a6478;padding:0 10px;">Use the UPI ID below</div>
                     </div>
                 </div>
 
-                <div style="font-size:13px;font-weight:600;color:var(--navy);margin-top:14px;">Kisi bhi UPI app se scan karo</div>
+                <div style="font-size:13px;font-weight:600;color:var(--navy);margin-top:14px;">Scan using any UPI app</div>
 
                 <!-- UPI ID Copy -->
                 <div class="upi-id-box" onclick="copyUPI()" title="Click to copy">
@@ -164,11 +164,11 @@
                     <span id="upi-text">hostelhub@okaxis</span>
                     <i class="fa-regular fa-copy" id="copy-icon" style="margin-left:auto;color:#9ba4b8;"></i>
                 </div>
-                <div style="font-size:11px;color:#9ba4b8;margin-top:6px;">👆 Click karke UPI ID copy karo</div>
+                <div style="font-size:11px;color:#9ba4b8;margin-top:6px;">👆 Click to copy UPI ID</div>
 
                 <!-- UPI App Buttons -->
                 <div style="margin-top:20px;border-top:1px solid #e8ecf4;padding-top:18px;">
-                    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a6478;margin-bottom:14px;">Ya seedha app mein open karo</div>
+                    <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a6478;margin-bottom:14px;">Or open directly in the app</div>
                     <div class="upi-apps">
 
                         <a href="tez://upi/pay?pa=hostelhub@okaxis&pn=HostelHub&am={{ allocation.monthly_rent }}&cu=INR&tn=HostelFee-{{ allocation.room.room_number }}" class="upi-btn gpay">
@@ -232,14 +232,14 @@
         <!-- Confirm Form -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title"><i class="fa-solid fa-circle-check" style="color:var(--success);margin-right:8px;"></i>Payment Confirm Karo</div>
-                <span class="badge badge-warning">Pay karne ke baad</span>
+                <div class="card-title"><i class="fa-solid fa-circle-check" style="color:var(--success);margin-right:8px;"></i>Confirm Payment</div>
+                <span class="badge badge-warning">After Payment</span>
             </div>
             <div class="card-body">
 
                 <div class="alert alert-info mb-16">
                     <i class="fa-solid fa-circle-info"></i>
-                    UPI app mein pay karne ke baad <strong>Transaction ID</strong> yahan daalo. Admin 24 ghante mein verify karega.
+                  After making payment in the UPI app, enter the <strong>Transaction ID</strong> here. Admin will verify it within 24 hours.
                 </div>
 
               <form method="post" action="{% url 'confirm_payment' %}" enctype="multipart/form-data">
@@ -247,9 +247,9 @@
                     <input type="hidden" name="allocation_id" value="{{ allocation.pk }}">
 
                     <div class="form-group">
-                        <label class="form-label">Konse Mahine ki Fee? *</label>
+                        <label class="form-label">Which month's fee? *</label>
                         <select name="month" class="form-control" required>
-                            <option value="">-- Month Chuno --</option>
+                            <option value="">-- Select Month --</option>
                             {% for m in months %}
                             <option value="{{ m }}">{{ m }}</option>
                             {% endfor %}
@@ -273,12 +273,12 @@
                                    placeholder="e.g. 406812345678" required>
                         </div>
                         <div style="font-size:12px;color:var(--gray-400);margin-top:5px;">
-                            <i class="fa-solid fa-info-circle"></i> UPI app ke transaction history mein milega
+                            <i class="fa-solid fa-info-circle"></i>You will find it in the UPI app transaction history
                         </div>
                     </div>
 
                     <div class="form-group">
-    <label class="form-label">Bank Slip Photo Upload Karo *</label>
+    <label class="form-label">Upload Bank Slip Photo *</label>
     <div id="slip-upload-box"
          onclick="document.getElementById('slip-input').click()"
          ondragover="event.preventDefault();this.style.borderColor='#c9a227';"
@@ -289,10 +289,10 @@
                 background:#faf8f2;">
         <i class="fa-solid fa-cloud-arrow-up" style="font-size:36px; color:#c9a227; margin-bottom:12px; display:block;"></i>
         <div style="font-size:15px; font-weight:600; color:#0a1628; margin-bottom:6px;">
-            Slip ki Photo Yahan Upload Karo
+            Slip Photo Upload Here
         </div>
         <div style="font-size:13px; color:#9ba4b8;">
-            Click karo ya drag & drop karo · JPG, PNG, PDF
+          Click or drag & drop · JPG, PNG, PDF
         </div>
        <input type="file" id="slip-input" name="slip_image"
        accept="image/*,.pdf" style="display:none;"
@@ -324,7 +324,7 @@
                             <option value="upi">Paytm</option>
                             <option value="upi">BHIM UPI</option>
                             <option value="online">Net Banking</option>
-                            <option value="cash">Cash (Warden ko diya)</option>
+                            <option value="cash">Cash (Given to Warden)</option>
                         </select>
                     </div>
 
@@ -338,7 +338,7 @@
                         <i class="fa-solid fa-paper-plane"></i> Submit Confirmation
                     </button>
                     <p style="font-size:12px;color:var(--gray-400);text-align:center;margin-top:10px;">
-                        Admin verify karke paid mark karega ✓
+                        Admin will verify and mark it as Paid ✓
                     </p>
                 </form>
             </div>
@@ -348,7 +348,7 @@
         <div class="card mt-24">
             <div class="card-header">
                 <div class="card-title">Recent Payments</div>
-                <a href="{% url 'my_payments' %}" class="btn btn-outline btn-sm">Sab dekho</a>
+                <a href="{% url 'my_payments' %}" class="btn btn-outline btn-sm">View All</a>
             </div>
             <div class="table-wrapper">
                 <table>
@@ -366,8 +366,8 @@
                             </td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--gray-400);">Koi payment nahi abhi tak</td></tr>
-                        {% endfor %}
+                        <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--gray-400);">No payments yet </td></tr>
+                        {% endfor %}tak
                     </tbody>
                 </table>
             </div>
