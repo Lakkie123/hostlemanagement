@@ -17,6 +17,23 @@ class StudentRegistrationForm(UserCreationForm):
     address = forms.CharField(widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Permanent Address'}))
     guardian_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Guardian Name'}))
     guardian_phone = forms.CharField(max_length=15, widget=forms.TextInput(attrs={'placeholder': 'Guardian Phone'}))
+    aadhar_front = forms.FileField(
+    required=True,
+    widget=forms.FileInput(attrs={'accept': '.pdf', 'class': 'form-control'}),
+    help_text='Aadhar Card Front (PDF, max 5MB)')
+    aadhar_back = forms.FileField(
+    required=True,
+    widget=forms.FileInput(attrs={'accept': '.pdf', 'class': 'form-control'}),
+    help_text='Aadhar Card Back (PDF, max 5MB)')
+    income_certificate = forms.FileField(
+    required=True,
+    widget=forms.FileInput(attrs={'accept': '.pdf', 'class': 'form-control'}),
+    help_text='Income Certificate (PDF, max 5MB)')
+    jeep_rank_card = forms.FileField(
+    required=True,
+    widget=forms.FileInput(attrs={'accept': '.pdf', 'class': 'form-control'}),
+    help_text='JEEP Rank Card (PDF, max 5MB)')
+    
 
     class Meta:
         model = User
@@ -45,6 +62,10 @@ class StudentRegistrationForm(UserCreationForm):
                 address=self.cleaned_data['address'],
                 guardian_name=self.cleaned_data['guardian_name'],
                 guardian_phone=self.cleaned_data['guardian_phone'],
+                aadhar_front=self.cleaned_data.get('aadhar_front'),
+                aadhar_back=self.cleaned_data.get('aadhar_back'),
+                income_certificate=self.cleaned_data.get('income_certificate'),
+                jeep_rank_card=self.cleaned_data.get('jeep_rank_card'),
             )
         return user
 
@@ -170,3 +191,40 @@ class ProfileUpdateForm(forms.ModelForm):
             self.fields['email'].initial = instance.user.email
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
+
+
+def clean_aadhar_front(self):
+    file = self.cleaned_data.get('aadhar_front')
+    if file:
+        if file.size > 5 * 1024 * 1024:
+            raise forms.ValidationError('File is too large. Maximum size allowed is 5MB.')
+        if not file.name.endswith('.pdf'):
+            raise forms.ValidationError('Only PDF files are allowed.')
+    return file
+
+def clean_aadhar_back(self):
+    file = self.cleaned_data.get('aadhar_back')
+    if file:
+        if file.size > 5 * 1024 * 1024:
+            raise forms.ValidationError('File is too large. Maximum size allowed is 5MB.')
+        if not file.name.endswith('.pdf'):
+            raise forms.ValidationError('Only PDF files are allowed.')
+    return file
+
+def clean_income_certificate(self):
+    file = self.cleaned_data.get('income_certificate')
+    if file:
+        if file.size > 5 * 1024 * 1024:
+            raise forms.ValidationError('File is too large. Maximum size allowed is 5MB.')
+        if not file.name.endswith('.pdf'):
+            raise forms.ValidationError('Only PDF files are allowed.')
+    return file
+
+def clean_jeep_rank_card(self):
+    file = self.cleaned_data.get('jeep_rank_card')
+    if file:
+        if file.size > 5 * 1024 * 1024:
+            raise forms.ValidationError('File is too large. Maximum size allowed is 5MB.')
+        if not file.name.endswith('.pdf'):
+            raise forms.ValidationError('Only PDF files are allowed.')
+    return file

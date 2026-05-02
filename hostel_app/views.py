@@ -50,7 +50,7 @@ def register_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
     if request.method == 'POST':
-        form = StudentRegistrationForm(request.POST)
+        form = StudentRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             messages.success(request, 'Registration successful! Please wait for admin approval.')

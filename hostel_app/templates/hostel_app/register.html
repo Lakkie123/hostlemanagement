@@ -103,7 +103,7 @@
         </div>
 
         <div class="card-body">
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
 
                 {% if form.errors %}
@@ -220,6 +220,63 @@
                         {{ form.guardian_phone }}
                     </div>
                 </div>
+
+                <!-- Documents -->
+<div class="section-divider">
+    <span><i class="fa-solid fa-file-pdf"></i> Required Documents</span>
+</div>
+
+<div style="background:rgba(201,162,39,0.08);border:1px solid rgba(201,162,39,0.2);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--gray-600);margin-bottom:20px;">
+    <i class="fa-solid fa-circle-info" style="color:var(--gold);"></i>
+    Sirf <strong>PDF format</strong> allowed hai. Maximum file size <strong>5MB</strong> per document.
+</div>
+
+<div class="form-grid">
+    <div class="form-group">
+        <label class="form-label">
+            <i class="fa-solid fa-id-card" style="color:var(--gold);"></i>
+            Aadhar Card Front *
+        </label>
+        {{ form.aadhar_front }}
+        {% if form.aadhar_front.errors %}
+        <div style="color:var(--danger);font-size:12px;margin-top:4px;">{{ form.aadhar_front.errors.0 }}</div>
+        {% endif %}
+        <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">Aadhar card ka front side PDF mein</div>
+    </div>
+    <div class="form-group">
+        <label class="form-label">
+            <i class="fa-solid fa-id-card" style="color:var(--gold);"></i>
+            Aadhar Card Back *
+        </label>
+        {{ form.aadhar_back }}
+        {% if form.aadhar_back.errors %}
+        <div style="color:var(--danger);font-size:12px;margin-top:4px;">{{ form.aadhar_back.errors.0 }}</div>
+        {% endif %}
+        <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">Aadhar card ka back side PDF mein</div>
+    </div>
+    <div class="form-group">
+        <label class="form-label">
+            <i class="fa-solid fa-file-invoice" style="color:var(--gold);"></i>
+            Income Certificate *
+        </label>
+        {{ form.income_certificate }}
+        {% if form.income_certificate.errors %}
+        <div style="color:var(--danger);font-size:12px;margin-top:4px;">{{ form.income_certificate.errors.0 }}</div>
+        {% endif %}
+        <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">Income certificate PDF mein</div>
+    </div>
+    <div class="form-group">
+        <label class="form-label">
+            <i class="fa-solid fa-ranking-star" style="color:var(--gold);"></i>
+            JEEP Rank Card *
+        </label>
+        {{ form.jeep_rank_card }}
+        {% if form.jeep_rank_card.errors %}
+        <div style="color:var(--danger);font-size:12px;margin-top:4px;">{{ form.jeep_rank_card.errors.0 }}</div>
+        {% endif %}
+        <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">JEEP rank card PDF mein</div>
+    </div>
+</div>
 
                 <div style="background:rgba(201,162,39,0.08);border:1px solid rgba(201,162,39,0.2);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--gray-600);margin-bottom:24px;">
                     <i class="fa-solid fa-info-circle" style="color:var(--gold);margin-right:8px;"></i>
