@@ -426,7 +426,20 @@ def approve_student(request, pk):
     messages.success(request, f'{student.user.get_full_name()} approved successfully!')
     return redirect('manage_students')
 
-
+ @login_required
+@user_passes_test(is_admin)
+def reject_student(request, pk):
+    student = get_object_or_404(StudentProfile, pk=pk)
+    user = student.user
+    name = user.get_full_name()
+    student.delete()
+    user.delete()
+    messages.success(request, f'{name} rejected and removed successfully!')
+    return redirect('manage_students')
+ 
+ 
+ 
+ 
 @login_required
 @user_passes_test(is_admin)
 def manage_allocations(request):

@@ -29,6 +29,7 @@ urlpatterns = [
     path('admin-panel/students/', views.manage_students, name='manage_students'),
     path('admin-panel/students/<int:pk>/', views.student_detail, name='student_detail'),
     path('admin-panel/students/<int:pk>/approve/', views.approve_student, name='approve_student'),
+    path('admin-panel/students/<int:pk>/reject/', views.reject_student, name='reject_student'),
     path('admin-panel/allocations/', views.manage_allocations, name='manage_allocations'),
     path('admin-panel/allocations/add/', views.add_allocation, name='add_allocation'),
     path('admin-panel/allocations/<int:pk>/vacate/', views.vacate_allocation, name='vacate_allocation'),

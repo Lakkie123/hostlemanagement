@@ -11,25 +11,18 @@
     </a>
 </div>
 
-<!-- Gender Filter Tabs -->
 <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;" class="fade-in">
-    <a href="{% url 'manage_students' %}"
-       class="btn {% if not gender_filter %}btn-primary{% else %}btn-outline{% endif %}">
+    <a href="{% url 'manage_students' %}" class="btn {% if not gender_filter %}btn-primary{% else %}btn-outline{% endif %}">
         <i class="fa-solid fa-users"></i> All Students
     </a>
-    <a href="{% url 'manage_students' %}?gender=M"
-       class="btn {% if gender_filter == 'M' %}btn-primary{% else %}btn-outline{% endif %}"
-       style="{% if gender_filter == 'M' %}background:#1a5fa8;color:white;border:none;{% endif %}">
+    <a href="{% url 'manage_students' %}?gender=M" class="btn {% if gender_filter == 'M' %}btn-primary{% else %}btn-outline{% endif %}" style="{% if gender_filter == 'M' %}background:#1a5fa8;color:white;border:none;{% endif %}">
         <i class="fa-solid fa-mars"></i> Boys Hostel ({{ boys_count }})
     </a>
-    <a href="{% url 'manage_students' %}?gender=F"
-       class="btn {% if gender_filter == 'F' %}btn-primary{% else %}btn-outline{% endif %}"
-       style="{% if gender_filter == 'F' %}background:#c2185b;color:white;border:none;{% endif %}">
+    <a href="{% url 'manage_students' %}?gender=F" class="btn {% if gender_filter == 'F' %}btn-primary{% else %}btn-outline{% endif %}" style="{% if gender_filter == 'F' %}background:#c2185b;color:white;border:none;{% endif %}">
         <i class="fa-solid fa-venus"></i> Girls Hostel ({{ girls_count }})
     </a>
 </div>
 
-<!-- Search + Status Filter -->
 <div class="card mb-20 fade-in fade-in-delay-1">
     <div class="card-body" style="padding:16px 24px;">
         <form method="get" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
@@ -52,7 +45,6 @@
     </div>
 </div>
 
-<!-- Students Table -->
 <div class="card fade-in fade-in-delay-2">
     <div class="card-header">
         <div class="card-title">
@@ -87,8 +79,7 @@
                 <tr>
                     <td>
                         <div style="display:flex;align-items:center;gap:12px;">
-                            <div class="avatar" style="width:36px;height:36px;border-radius:10px;font-size:13px;
-                                {% if student.gender == 'F' %}background:#c2185b;{% else %}background:#1a5fa8;{% endif %}">
+                            <div class="avatar" style="width:36px;height:36px;border-radius:10px;font-size:13px;{% if student.gender == 'F' %}background:#c2185b;{% else %}background:#1a5fa8;{% endif %}">
                                 {{ student.user.first_name|first|upper }}{{ student.user.last_name|first|upper }}
                             </div>
                             <div>
@@ -135,6 +126,9 @@
                             <a href="{% url 'approve_student' student.pk %}" class="btn btn-success btn-sm" data-tooltip="Approve">
                                 <i class="fa-solid fa-check"></i>
                             </a>
+                            <a href="{% url 'reject_student' student.pk %}" class="btn btn-danger btn-sm" data-tooltip="Reject" onclick="return confirm('Reject this student?')">
+                                <i class="fa-solid fa-x"></i>
+                            </a>
                             {% endif %}
                         </div>
                     </td>
@@ -159,5 +153,4 @@
         </table>
     </div>
 </div>
-
 {% endblock %}
