@@ -454,7 +454,7 @@ def bulk_delete_students(request):
 
 
 @login_required
- @user_passes_test(is_admin)
+@user_passes_test(is_admin)
 def manage_allocations(request):
     allocations = RoomAllocation.objects.select_related('student__user', 'room').order_by('-created_at')
     status_filter = request.GET.get('status', '')
