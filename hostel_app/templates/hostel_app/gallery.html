@@ -356,25 +356,32 @@
                 </div>
                 <div class="photo-overlay"><div class="photo-caption">Sports Ground</div></div>
             </div>
-            <div class="photo-card">
-                <div class="photo-placeholder">
+            <div class="photo-card" onclick="openLightbox('/static/hostel_app/gallery/football.jpg', 'Football Field')">
+                <img src="/static/hostel_app/gallery/football.jpg" alt="Football"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="photo-placeholder" style="display:none;">
                     <div class="emoji">⚽</div>
                     <div class="label">Football</div>
                 </div>
+                <div class="photo-overlay"><div class="photo-caption">Football Field</div></div>
             </div>
-            <div class="photo-card">
-                <div class="photo-placeholder">
+            <div class="photo-card" onclick="openLightbox('/static/hostel_app/gallery/volleyball.jpg', 'Volleyball Court')">
+                <img src="/static/hostel_app/gallery/volleyball.jpg" alt="Volleyball"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="photo-placeholder" style="display:none;">
                     <div class="emoji">🏐</div>
                     <div class="label">Volleyball</div>
                 </div>
+                <div class="photo-overlay"><div class="photo-caption">Volleyball Court</div></div>
             </div>
-            <div class="photo-card">
-                <div class="photo-placeholder" onclick="openLightbox('/static/hostel_app/gallery/indoor.jpg', 'Indoor Games')">
-                    <img src="/static/hostel_app/gallery/indoor.jpg" alt="Indoor Games"
+            <div class="photo-card" onclick="openLightbox('/static/hostel_app/gallery/indoor.jpg', 'Indoor Games')">
+                <img src="/static/hostel_app/gallery/indoor.jpg" alt="Indoor Games"
                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="photo-placeholder" style="display:none;">
                     <div class="emoji">♟️</div>
                     <div class="label">Indoor Games</div>
                 </div>
+                <div class="photo-overlay"><div class="photo-caption">Indoor Games</div></div>
             </div>
         </div>
     </div>
