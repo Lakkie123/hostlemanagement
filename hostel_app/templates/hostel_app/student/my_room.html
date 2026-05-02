@@ -1,5 +1,5 @@
 {% extends 'hostel_app/student/base_student.html' %}
-{% block title %}My Room — HostelHub{% endblock %}
+{% block title %}My Room — GPD HOSTELS{% endblock %}
 {% block student_content %}
 
 <div class="page-header fade-in">
@@ -54,8 +54,8 @@
                     <span style="font-weight:600;color:var(--navy);">{{ allocation.room.room_type.name }}</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--gray-200);">
-                    <span style="font-size:14px;color:var(--gray-600);">Monthly Rent</span>
-                    <span style="font-weight:700;font-size:16px;color:var(--success);">₹{{ allocation.monthly_rent }}</span>
+                    <span style="font-size:14px;color:var(--gray-600);">Yearly Rent</span>
+                    <span style="font-weight:700;font-size:16px;color:var(--success);">₹{{ allocation.yearly_rent }}</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--gray-200);">
                     <span style="font-size:14px;color:var(--gray-600);">Security Deposit</span>

@@ -1,5 +1,5 @@
 {% extends 'hostel_app/student/base_student.html' %}
-{% block title %}Pay Fee — HostelHub{% endblock %}
+{% block title %}Pay Fee — GPD HOSTELS{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -116,7 +116,7 @@
         <div class="step-line"></div>
         <div class="step-dot"><div class="num">2</div><div class="txt">Scan QR / Open App</div></div>
         <div class="step-line"></div>
-        <div class="step-dot"><div class="num">3</div><div class="txt">Pay ₹{{ allocation.monthly_rent }}</div></div>
+        <div class="step-dot"><div class="num">3</div><div class="txt">Pay ₹{{ allocation.yearly_rent }}</div></div>
         <div class="step-line"></div>
         <div class="step-dot"><div class="num">4</div><div class="txt">Enter Txn ID</div></div>
         <div class="step-line"></div>
@@ -130,8 +130,8 @@
     <div>
         <!-- Amount Box -->
         <div class="amount-display">
-            <div class="label">Monthly Fee</div>
-            <div class="amount">₹{{ allocation.monthly_rent }}</div>
+            <div class="label">Yearly Fee</div>
+            <div class="amount">₹{{ allocation.yearly_rent }}</div>
             <div class="room-info">Room {{ allocation.room.room_number }} · {{ profile.user.get_full_name }}</div>
         </div>
 
@@ -147,7 +147,7 @@
                 <div class="qr-box">
                     <div class="qr-scan-line"></div>
                     <img id="qr-img"
-                        src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3Dhostelhub%40okaxis%26pn%3DHostelHub%26am%3D{{ allocation.monthly_rent }}%26cu%3DINR%26tn%3DHostelFee-{{ allocation.room.room_number }}-{{ profile.roll_number }}"
+                        src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3Dgpdhostels%40okaxis%26pn%3DGPDHOSTELS%26am%3D{{ allocation.yearly_rent }}%26cu%3DINR%26tn%3DGPDHostelFee-{{ allocation.room.room_number }}-{{ profile.roll_number }}"
                         alt="UPI QR" width="200" height="200" style="display:block;"
                         onerror="this.style.display='none';document.getElementById('qr-err').style.display='flex';">
                     <div id="qr-err" style="display:none;width:200px;height:200px;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:#f4f6fa;">
@@ -161,7 +161,7 @@
                 <!-- UPI ID Copy -->
                 <div class="upi-id-box" onclick="copyUPI()" title="Click to copy">
                     <i class="fa-solid fa-at" style="color:var(--gold);"></i>
-                    <span id="upi-text">hostelhub@okaxis</span>
+                    <span id="upi-text">gpdhostels@okaxis</span>
                     <i class="fa-regular fa-copy" id="copy-icon" style="margin-left:auto;color:#9ba4b8;"></i>
                 </div>
                 <div style="font-size:11px;color:#9ba4b8;margin-top:6px;">👆 Click to copy UPI ID</div>
@@ -171,28 +171,28 @@
                     <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5a6478;margin-bottom:14px;">Or open directly in the app</div>
                     <div class="upi-apps">
 
-                        <a href="tez://upi/pay?pa=hostelhub@okaxis&pn=HostelHub&am={{ allocation.monthly_rent }}&cu=INR&tn=HostelFee-{{ allocation.room.room_number }}" class="upi-btn gpay">
+                        <a href="tez://upi/pay?pa=gpdhostels@okaxis&pn=GPDHOSTELS&am={{ allocation.yearly_rent }}&cu=INR&tn=GPDHostelFee-{{ allocation.room.room_number }}" class="upi-btn gpay">
                             <div class="upi-logo" style="background:white;border:1.5px solid #ddd;">
                                 <svg width="22" height="22" viewBox="0 0 48 48"><text y="30" font-size="26" font-family="Arial" font-weight="bold" fill="#4285f4">G</text></svg>
                             </div>
                             Google Pay
                         </a>
 
-                        <a href="phonepe://pay?pa=hostelhub@okaxis&pn=HostelHub&am={{ allocation.monthly_rent }}&cu=INR&tn=HostelFee-{{ allocation.room.room_number }}" class="upi-btn phonepe">
+                        <a href="phonepe://pay?pa=gpdhostels@okaxis&pn=GPDHOSTELS&am={{ allocation.yearly_rent }}&cu=INR&tn=GPDHostelFee-{{ allocation.room.room_number }}" class="upi-btn phonepe">
                             <div class="upi-logo" style="background:#5f259f;">
                                 <i class="fa-solid fa-bolt" style="font-size:13px;"></i>
                             </div>
                             PhonePe
                         </a>
 
-                        <a href="paytmmp://pay?pa=hostelhub@okaxis&pn=HostelHub&am={{ allocation.monthly_rent }}&cu=INR&tn=HostelFee-{{ allocation.room.room_number }}" class="upi-btn paytm">
+                        <a href="paytmmp://pay?pa=gpdhostels@okaxis&pn=GPDHOSTELS&am={{ allocation.yearly_rent }}&cu=INR&tn=GPDHostelFee-{{ allocation.room.room_number }}" class="upi-btn paytm">
                             <div class="upi-logo" style="background:#00b9f1;">
                                 <span style="font-size:8px;">PAY</span>
                             </div>
                             Paytm
                         </a>
 
-                        <a href="upi://pay?pa=hostelhub@okaxis&pn=HostelHub&am={{ allocation.monthly_rent }}&cu=INR&tn=HostelFee-{{ allocation.room.room_number }}" class="upi-btn bhim">
+                        <a href="upi://pay?pa=gpdhostels@okaxis&pn=GPDHOSTELS&am={{ allocation.yearly_rent }}&cu=INR&tn=GPDHostelFee-{{ allocation.room.room_number }}" class="upi-btn bhim">
                             <div class="upi-logo" style="background:#00a650;">
                                 <span style="font-size:8px;">UPI</span>
                             </div>
@@ -278,7 +278,7 @@
                     </div>
 
                     <div class="form-group">
-    <label class="form-label">Upload Bank Slip Photo *</label>
+    <label class="form-label">Upload the screenshot of payment / slip here  *</label>
     <div id="slip-upload-box"
          onclick="document.getElementById('slip-input').click()"
          ondragover="event.preventDefault();this.style.borderColor='#c9a227';"
@@ -289,7 +289,7 @@
                 background:#faf8f2;">
         <i class="fa-solid fa-cloud-arrow-up" style="font-size:36px; color:#c9a227; margin-bottom:12px; display:block;"></i>
         <div style="font-size:15px; font-weight:600; color:#0a1628; margin-bottom:6px;">
-            Slip Photo Upload Here
+            Screenshot/slip Upload Here
         </div>
         <div style="font-size:13px; color:#9ba4b8;">
           Click or drag & drop · JPG, PNG, PDF
@@ -330,7 +330,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Note (Optional)</label>
-                        <textarea name="notes" class="form-control" rows="2" placeholder="Koi remark..."></textarea>
+                        <textarea name="notes" class="form-control" rows="2" placeholder="Enter any remarks..."></textarea>
                     </div>
 
                     <button type="submit" class="btn btn-gold btn-lg" style="width:100%;justify-content:center;"
@@ -451,18 +451,18 @@ function checkSlip() {
             box.style.background = 'rgba(217,79,79,0.04)';
             box.innerHTML = `
                 <i class="fa-solid fa-triangle-exclamation" style="font-size:36px;color:#d94f4f;margin-bottom:12px;display:block;"></i>
-                <div style="font-size:15px;font-weight:700;color:#d94f4f;margin-bottom:6px;">Bank Slip Upload Karna Zaroori Hai!</div>
-                <div style="font-size:13px;color:#9ba4b8;">Bina slip ke payment submit nahi hogi</div>
+                <div style="font-size:15px;font-weight:700;color:#d94f4f;margin-bottom:6px;">Slip/ screenshot required necessary!</div>
+                <div style="font-size:13px;color:#9ba4b8;">payment slip is required to submit your payment</div>
                 <input type="file" id="slip-input" name="slip_image"
                        accept="image/*,.pdf" style="display:none;"
                        required onchange="previewSlip(this)">
-            `;
-            // Scroll karke dikhao
+            ";
+            // show the box in viewport
             box.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-        return false; // Form submit mat hone do
+        return false; // dont submit the form
     }
-    return true; // Sab theek hai — submit karo
+    return true; // everything is fine, submit the form
 }
 </script>
 {% endblock %}

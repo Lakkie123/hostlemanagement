@@ -238,7 +238,7 @@ def confirm_payment(request):
         payment.slip_image = request.FILES['slip_image']
     payment.save()
     
-    messages.success(request, '✅ Payment submit ho gayi! Admin slip verify karke confirm karega.')
+    messages.success(request, '✅ payment verified successfully admin approved it! Please wait for admin approval.')
     return redirect('pay_fee')
 
 
@@ -449,7 +449,7 @@ def bulk_delete_students(request):
                 user.delete()
             messages.success(request, f'{len(selected)} students deleted successfully!')
         else:
-            messages.error(request, 'Koi student select nahi kiya!')
+            messages.error(request, 'no students selected!')
     return redirect('manage_students') 
 
 
@@ -633,14 +633,14 @@ def verify_payment(request, pk):
             payment.status = 'paid'
             payment.received_by = request.user
             payment.save()
-            messages.success(request, f'✅ ₹{payment.amount} verify ho gayi — {payment.allocation.student.user.get_full_name()}')
+            messages.success(request, f'✅ ₹{payment.amount} verified — {payment.allocation.student.user.get_full_name()}')
         elif action == 'reject':
             reject_reason = request.POST.get('reject_reason', '')
             payment.status = 'overdue'
             payment.notes = f'REJECTED: {reject_reason}'
             payment.transaction_id = ''
             payment.save()
-            messages.error(request, f'❌ Payment reject kar di — {payment.allocation.student.user.get_full_name()}')
+            messages.error(request, f'❌ payment rejected — {payment.allocation.student.user.get_full_name()}')
     return redirect('pending_verifications')
 
 
