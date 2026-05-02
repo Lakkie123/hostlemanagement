@@ -45,7 +45,6 @@ def home(request):
         'total_students': total_students,
     })
 
-
 def register_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -53,8 +52,9 @@ def register_view(request):
         form = StudentRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
+            login(request, user)  # ← yeh add karo
             messages.success(request, 'Registration successful! Please wait for admin approval.')
-            return redirect('login')
+            return redirect('student_dashboard')  # ← yeh bhi change karo
         else:
             messages.error(request, 'Please correct the errors below.')
     else:

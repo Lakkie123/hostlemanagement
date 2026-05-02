@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from cloudinary.models import CloudinaryField
 
 
 class StudentProfile(models.Model):
@@ -18,11 +19,11 @@ class StudentProfile(models.Model):
     guardian_name = models.CharField(max_length=100, blank=True)
     guardian_phone = models.CharField(max_length=15, blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    profile_photo = models.ImageField(upload_to='profiles/', null=True, blank=True)
-    aadhar_front = models.FileField(upload_to='documents/aadhar/', null=True, blank=True)
-    aadhar_back = models.FileField(upload_to='documents/aadhar/', null=True, blank=True)
-    income_certificate = models.FileField(upload_to='documents/income/', null=True, blank=True)
-    jeep_rank_card = models.FileField(upload_to='documents/jeep/', null=True, blank=True)
+    profile_photo = CloudinaryField('Profile Photo', null=True, blank=True)
+    aadhar_front = CloudinaryField('aadhar_front', resource_type='raw', null=True, blank=True)
+    aadhar_back = CloudinaryField('aadhar_back', resource_type='raw', null=True, blank=True)
+    income_certificate = CloudinaryField('income_certificate', resource_type='raw', null=True, blank=True)
+    jeep_rank_card = CloudinaryField('jeep_rank_card', resource_type='raw', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
