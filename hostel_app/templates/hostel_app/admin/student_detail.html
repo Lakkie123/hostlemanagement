@@ -75,6 +75,42 @@
                 <strong style="color:var(--navy);">Address:</strong><br>{{ student.address }}
             </div>
             {% endif %}
+
+
+
+<!-- Documents Section -->
+<div class="divider"></div>
+<div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:12px;">Documents</div>
+<div style="display:grid;gap:10px;">
+    {% if student.aadhar_front %}
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--gray-200);padding-bottom:10px;">
+        <span style="font-size:13px;color:var(--gray-600);">Aadhar Front</span>
+        <a href="{{ student.aadhar_front.url }}" target="_blank" class="btn btn-outline btn-sm"><i class="fa-solid fa-file"></i> View</a>
+    </div>
+    {% endif %}
+    {% if student.aadhar_back %}
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--gray-200);padding-bottom:10px;">
+        <span style="font-size:13px;color:var(--gray-600);">Aadhar Back</span>
+        <a href="{{ student.aadhar_back.url }}" target="_blank" class="btn btn-outline btn-sm"><i class="fa-solid fa-file"></i> View</a>
+    </div>
+    {% endif %}
+    {% if student.income_certificate %}
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--gray-200);padding-bottom:10px;">
+        <span style="font-size:13px;color:var(--gray-600);">Income Certificate</span>
+        <a href="{{ student.income_certificate.url }}" target="_blank" class="btn btn-outline btn-sm"><i class="fa-solid fa-file"></i> View</a>
+    </div>
+    {% endif %}
+    {% if student.jeep_rank_card %}
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;">
+        <span style="font-size:13px;color:var(--gray-600);">Jeep Rank Card</span>
+        <a href="{{ student.jeep_rank_card.url }}" target="_blank" class="btn btn-outline btn-sm"><i class="fa-solid fa-file"></i> View</a>
+    </div>
+    {% endif %}
+    {% if not student.aadhar_front and not student.aadhar_back and not student.income_certificate and not student.jeep_rank_card %}
+    <div style="font-size:13px;color:var(--gray-400);">No documents uploaded</div>
+    {% endif %}
+    
+</div>
         </div>
     </div>
 

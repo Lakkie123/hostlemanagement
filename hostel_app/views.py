@@ -413,7 +413,7 @@ def student_detail(request, pk):
         'allocations': allocations,
         'complaints': complaints,
         'payments': payments,
-        'field_data': [],
+        
     })
 
 
