@@ -45,112 +45,144 @@
     </div>
 </div>
 
-<div class="card fade-in fade-in-delay-2">
-    <div class="card-header">
-        <div class="card-title">
-            {% if gender_filter == 'M' %}
-            <i class="fa-solid fa-mars" style="color:#1a5fa8;margin-right:8px;"></i> Boys Hostel Students
-            {% elif gender_filter == 'F' %}
-            <i class="fa-solid fa-venus" style="color:#c2185b;margin-right:8px;"></i> Girls Hostel Students
-            {% else %}
-            <i class="fa-solid fa-users" style="color:var(--gold);margin-right:8px;"></i> All Students
-            {% endif %}
+<form method="post" action="{% url 'bulk_delete_students' %}" id="bulkForm">
+    {% csrf_token %}
+    <div class="card fade-in fade-in-delay-2">
+        <div class="card-header">
+            <div class="card-title">
+                {% if gender_filter == 'M' %}
+                <i class="fa-solid fa-mars" style="color:#1a5fa8;margin-right:8px;"></i> Boys Hostel Students
+                {% elif gender_filter == 'F' %}
+                <i class="fa-solid fa-venus" style="color:#c2185b;margin-right:8px;"></i> Girls Hostel Students
+                {% else %}
+                <i class="fa-solid fa-users" style="color:var(--gold);margin-right:8px;"></i> All Students
+                {% endif %}
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <span class="badge badge-navy">{{ students|length }} Students</span>
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Selected students delete ho jayenge — sure ho?')" id="bulkDeleteBtn" style="display:none;">
+                    <i class="fa-solid fa-trash"></i> Delete Selected
+                </button>
+            </div>
         </div>
-        <div style="display:flex;gap:8px;">
-            <span class="badge badge-navy">{{ students|length }} Students</span>
-        </div>
-    </div>
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>Student</th>
-                    <th>Roll No.</th>
-                    <th>Course</th>
-                    <th>Gender</th>
-                    <th>Phone</th>
-                    <th>Status</th>
-                    <th>Joined</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for student in students %}
-                <tr>
-                    <td>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div class="avatar" style="width:36px;height:36px;border-radius:10px;font-size:13px;{% if student.gender == 'F' %}background:#c2185b;{% else %}background:#1a5fa8;{% endif %}">
-                                {{ student.user.first_name|first|upper }}{{ student.user.last_name|first|upper }}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:40px;">
+                            <input type="checkbox" id="selectAll" style="cursor:pointer;">
+                        </th>
+                        <th>Student</th>
+                        <th>Roll No.</th>
+                        <th>Course</th>
+                        <th>Gender</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="selected_students" value="{{ student.pk }}" class="student-checkbox" style="cursor:pointer;">
+                        </td>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <div class="avatar" style="width:36px;height:36px;border-radius:10px;font-size:13px;{% if student.gender == 'F' %}background:#c2185b;{% else %}background:#1a5fa8;{% endif %}">
+                                    {{ student.user.first_name|first|upper }}{{ student.user.last_name|first|upper }}
+                                </div>
+                                <div>
+                                    <div style="font-weight:600;font-size:14px;">{{ student.user.get_full_name }}</div>
+                                    <div style="font-size:12px;color:var(--gray-400);">{{ student.user.email }}</div>
+                                </div>
                             </div>
-                            <div>
-                                <div style="font-weight:600;font-size:14px;">{{ student.user.get_full_name }}</div>
-                                <div style="font-size:12px;color:var(--gray-400);">{{ student.user.email }}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <code style="background:var(--gray-100);padding:3px 8px;border-radius:6px;font-size:13px;">
-                            {{ student.roll_number }}
-                        </code>
-                    </td>
-                    <td>
-                        <div style="font-size:13px;">{{ student.course }}</div>
-                        <div style="font-size:12px;color:var(--gray-400);">Year {{ student.year_of_study }}</div>
-                    </td>
-                    <td>
-                        {% if student.gender == 'F' %}
-                        <span class="badge" style="background:rgba(194,24,91,0.1);color:#c2185b;">
-                            <i class="fa-solid fa-venus"></i> Female
-                        </span>
-                        {% elif student.gender == 'M' %}
-                        <span class="badge" style="background:rgba(26,95,168,0.1);color:#1a5fa8;">
-                            <i class="fa-solid fa-mars"></i> Male
-                        </span>
-                        {% else %}
-                        <span class="badge badge-gray">Other</span>
-                        {% endif %}
-                    </td>
-                    <td style="font-size:13px;">{{ student.phone }}</td>
-                    <td>
-                        <span class="badge {% if student.status == 'active' %}badge-success{% elif student.status == 'pending' %}badge-warning{% else %}badge-gray{% endif %}">
-                            {{ student.get_status_display }}
-                        </span>
-                    </td>
-                    <td style="font-size:13px;color:var(--gray-600);">{{ student.created_at|date:"d M Y" }}</td>
-                    <td>
-                        <div style="display:flex;gap:8px;">
-                            <a href="{% url 'student_detail' student.pk %}" class="btn btn-outline btn-sm" data-tooltip="View Details">
-                                <i class="fa-solid fa-eye"></i>
-                            </a>
-                            {% if student.status == 'pending' %}
-                            <a href="{% url 'approve_student' student.pk %}" class="btn btn-success btn-sm" data-tooltip="Approve">
-                                <i class="fa-solid fa-check"></i>
-                            </a>
-                            <a href="{% url 'reject_student' student.pk %}" class="btn btn-danger btn-sm" data-tooltip="Reject" onclick="return confirm('Reject this student?')">
-                                <i class="fa-solid fa-x"></i>
-                            </a>
+                        </td>
+                        <td>
+                            <code style="background:var(--gray-100);padding:3px 8px;border-radius:6px;font-size:13px;">
+                                {{ student.roll_number }}
+                            </code>
+                        </td>
+                        <td>
+                            <div style="font-size:13px;">{{ student.course }}</div>
+                            <div style="font-size:12px;color:var(--gray-400);">Year {{ student.year_of_study }}</div>
+                        </td>
+                        <td>
+                            {% if student.gender == 'F' %}
+                            <span class="badge" style="background:rgba(194,24,91,0.1);color:#c2185b;">
+                                <i class="fa-solid fa-venus"></i> Female
+                            </span>
+                            {% elif student.gender == 'M' %}
+                            <span class="badge" style="background:rgba(26,95,168,0.1);color:#1a5fa8;">
+                                <i class="fa-solid fa-mars"></i> Male
+                            </span>
+                            {% else %}
+                            <span class="badge badge-gray">Other</span>
                             {% endif %}
-                        </div>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="8">
-                        <div class="empty-state">
-                            <i class="fa-solid fa-users"></i>
-                            <h3>No Students Found</h3>
-                            <p>
-                                {% if gender_filter == 'M' %}No boys registered yet.
-                                {% elif gender_filter == 'F' %}No girls registered yet.
-                                {% else %}Students will appear here after registration.
+                        </td>
+                        <td style="font-size:13px;">{{ student.phone }}</td>
+                        <td>
+                            <span class="badge {% if student.status == 'active' %}badge-success{% elif student.status == 'pending' %}badge-warning{% else %}badge-gray{% endif %}">
+                                {{ student.get_status_display }}
+                            </span>
+                        </td>
+                        <td style="font-size:13px;color:var(--gray-600);">{{ student.created_at|date:"d M Y" }}</td>
+                        <td>
+                            <div style="display:flex;gap:8px;">
+                                <a href="{% url 'student_detail' student.pk %}" class="btn btn-outline btn-sm" data-tooltip="View Details">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                {% if student.status == 'pending' %}
+                                <a href="{% url 'approve_student' student.pk %}" class="btn btn-success btn-sm" data-tooltip="Approve">
+                                    <i class="fa-solid fa-check"></i>
+                                </a>
+                                <a href="{% url 'reject_student' student.pk %}" class="btn btn-danger btn-sm" data-tooltip="Reject" onclick="return confirm('Reject this student?')">
+                                    <i class="fa-solid fa-x"></i>
+                                </a>
                                 {% endif %}
-                            </p>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9">
+                            <div class="empty-state">
+                                <i class="fa-solid fa-users"></i>
+                                <h3>No Students Found</h3>
+                                <p>
+                                    {% if gender_filter == 'M' %}No boys registered yet.
+                                    {% elif gender_filter == 'F' %}No girls registered yet.
+                                    {% else %}Students will appear here after registration.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+</form>
+
+<script>
+const selectAll = document.getElementById('selectAll');
+const checkboxes = document.querySelectorAll('.student-checkbox');
+const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+selectAll.addEventListener('change', function() {
+    checkboxes.forEach(cb => cb.checked = this.checked);
+    bulkDeleteBtn.style.display = this.checked ? 'inline-flex' : 'none';
+});
+
+checkboxes.forEach(cb => {
+    cb.addEventListener('change', function() {
+        const anyChecked = Array.from(checkboxes).some(c => c.checked);
+        bulkDeleteBtn.style.display = anyChecked ? 'inline-flex' : 'none';
+        selectAll.checked = Array.from(checkboxes).every(c => c.checked);
+    });
+});
+</script>
+
 {% endblock %}

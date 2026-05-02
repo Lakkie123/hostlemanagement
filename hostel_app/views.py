@@ -416,7 +416,6 @@ def student_detail(request, pk):
         
     })
 
-
 @login_required
 @user_passes_test(is_admin)
 def approve_student(request, pk):
@@ -426,7 +425,7 @@ def approve_student(request, pk):
     messages.success(request, f'{student.user.get_full_name()} approved successfully!')
     return redirect('manage_students')
 
- @login_required
+@login_required
 @user_passes_test(is_admin)
 def reject_student(request, pk):
     student = get_object_or_404(StudentProfile, pk=pk)
@@ -437,11 +436,25 @@ def reject_student(request, pk):
     messages.success(request, f'{name} rejected and removed successfully!')
     return redirect('manage_students')
  
- 
- 
- 
 @login_required
 @user_passes_test(is_admin)
+def bulk_delete_students(request):
+    if request.method == 'POST':
+        selected = request.POST.getlist('selected_students')
+        if selected:
+            students = StudentProfile.objects.filter(pk__in=selected)
+            users = [s.user for s in students]
+            students.delete()
+            for user in users:
+                user.delete()
+            messages.success(request, f'{len(selected)} students deleted successfully!')
+        else:
+            messages.error(request, 'Koi student select nahi kiya!')
+    return redirect('manage_students') 
+
+
+@login_required
+ @user_passes_test(is_admin)
 def manage_allocations(request):
     allocations = RoomAllocation.objects.select_related('student__user', 'room').order_by('-created_at')
     status_filter = request.GET.get('status', '')
